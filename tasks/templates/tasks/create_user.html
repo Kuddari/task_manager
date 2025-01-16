@@ -1,0 +1,47 @@
+<!-- create_user.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="max-w-md mx-auto mt-8">
+    <h2 class="text-2xl font-bold text-center mb-4">Create New User</h2>
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="mb-4">
+        <label for="id_first_name" class="block text-sm font-medium">First Name</label>
+        {{ form.first_name }}
+      </div>
+
+      <div class="mb-4">
+        <label for="id_last_name" class="block text-sm font-medium">Last Name</label>
+        {{ form.last_name }}
+      </div>
+
+      <div class="mb-4">
+        <label for="id_username" class="block text-sm font-medium">Username</label>
+        {{ form.username }}
+      </div>
+
+      <div class="mb-4">
+        <label for="id_email" class="block text-sm font-medium">Email</label>
+        {{ form.email }}
+      </div>
+
+      <div class="mb-4">
+        <label for="id_profile_picture" class="block text-sm font-medium">Profile Picture</label>
+        {{ form.profile_picture }}
+      </div>
+
+      <div class="mb-4">
+        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Create User</button>
+      </div>
+
+      {% if messages %}
+        <div class="alert">
+          {% for message in messages %}
+            <div class="alert-message">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </form>
+  </div>
+{% endblock %}

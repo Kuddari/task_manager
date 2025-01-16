@@ -1,0 +1,20 @@
+<!-- tasks/project_list.html -->
+<h1>Your Projects</h1>
+
+<!-- Display list of projects -->
+{% for project in projects %}
+<div class="p-4 border mb-4">
+    <h2>{{ project.name }}</h2>
+    <a href="{% url 'project_detail' project.id %}">View Details</a>
+</div>
+{% empty %}
+<p>No projects found.</p>
+{% endfor %}
+
+<!-- Create New Project Form -->
+<h2>Create New Project</h2>
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Create Project</button>
+</form>

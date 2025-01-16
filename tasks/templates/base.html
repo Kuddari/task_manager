@@ -1,0 +1,23 @@
+<!-- base_generic.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert">
+                <div class="alert-message">{{ message }}</div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
