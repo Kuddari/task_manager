@@ -4,24 +4,17 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
 class UserCreateForm(UserCreationForm):
-    first_name = forms.CharField(max_length=30, required=True, label='First Name')
-    last_name = forms.CharField(max_length=30, required=True, label='Last Name')
+    first_name = forms.CharField(max_length=30, required=True)
+    last_name = forms.CharField(max_length=30, required=True)
     username = forms.CharField(max_length=150, required=True)
     email = forms.EmailField(required=True)
-    profile_picture = forms.ImageField(required=False, label="Profile Picture", widget=forms.ClearableFileInput())
+    profile_picture = forms.ImageField(required=False, label="Profile Picture")
 
     class Meta:
         model = get_user_model()
         fields = ['username', 'first_name', 'last_name', 'email', 'profile_picture']
 
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['name', 'description', 'members', 'start_date', 'end_date', 'is_active']
-        widgets = {
-            'start_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'end_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        }
+
 
 class TaskForm(forms.ModelForm):
     class Meta:

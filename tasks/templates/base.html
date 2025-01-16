@@ -1,15 +1,22 @@
 <!-- base_generic.html -->
+{% load static tailwind_tags %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
+    {% tailwind_css %}
     <meta charset="UTF-8">
-    <title>Task Manager</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/font.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/th.js"></script>
+    <title>{% block title %}My Tasks{% endblock %}</title>
 </head>
-<body>
+
+<body class="font-prompt">
+    {% block content %}
     <div class="container mx-auto">
-        {% block content %}
-        {% endblock %}
     </div>
 
     <div class="messages">
@@ -19,5 +26,7 @@
             </div>
         {% endfor %}
     </div>
+    {% endblock %}
+
 </body>
 </html>

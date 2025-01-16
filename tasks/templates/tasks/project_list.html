@@ -1,20 +1,230 @@
-<!-- tasks/project_list.html -->
-<h1>Your Projects</h1>
+{% extends 'base.html' %}
 
-<!-- Display list of projects -->
-{% for project in projects %}
-<div class="p-4 border mb-4">
-    <h2>{{ project.name }}</h2>
-    <a href="{% url 'project_detail' project.id %}">View Details</a>
-</div>
-{% empty %}
-<p>No projects found.</p>
-{% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
 
-<!-- Create New Project Form -->
-<h2>Create New Project</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-primary">Create Project</button>
-</form>
+    {% block title %}
+        My Project
+    {% endblock %}
+    <style>
+        /* เพิ่มพื้นหลังเบลอ */
+        .backdrop-blur {
+            backdrop-filter: blur(5px); /* ทำให้พื้นหลังเบลอ */
+            -webkit-backdrop-filter: blur(5px); /* สำหรับเบราว์เซอร์ที่รองรับ */
+        }
+    
+
+    </style>
+
+</head>
+<body>
+    {% block content %}
+    <div class="flex flex-row min-h-screen">
+        <div class="w-1/2 bg-slate-700 bg-cover bg-center min-h-screen" style="background-image: url('{% static "images/bg.jpg" %}');">
+          
+           <div class="pt-8 px-8">
+            <!-- Button to trigger popup -->
+            <div class="flex justify-end">
+                <button onclick="openPopup()" class="py-2 px-4 bg-black bg-opacity-65 backdrop-blur text-white rounded-lg text-xl hover:bg-black hover:bg-opacity-80 hover:scale-105 transition-all duration-400">
+                    เพิ่มงาน
+                </button>
+            </div>
+            <!-- Display list of projects -->
+            {% for project in projects %}
+            <div class="mt-20 border-2 border-black">
+                <div class=" bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg"></div>
+                    <h2>{{ project.name }}</h2>
+                </div>
+                <a href="{% url 'project_detail' project.id %}">View Details</a>
+                {% empty %}
+                <div class="mt-52 relative shadow-md rounded-lg text-center">
+                    <div class=" bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg">
+                      <h1 class="text-xl">ไม่มีงาน</h1>
+                    </div>
+                </div>
+                
+ 
+                {% endfor %}        
+            </div>
+          
+   
+           <!-- Create New Project Form - Popup Modal -->
+           <div id="projectModal" class="z-10 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+               <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
+                   <div class="flex justify-between">
+                       <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
+                       <!-- Close Button -->
+                       <button onclick="closePopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                   </div>
+                   <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                       {% csrf_token %}
+                       
+                       <!-- First Name -->
+                       <div class="flex flex-col">
+                           <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+                           <div class="mt-1">
+                               <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                           </div>
+                          
+                       </div>
+                   
+                       <!-- Description -->
+                       <div class="flex flex-col">
+                           <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                           <div class="mt-1">
+                               <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="4"></textarea>
+                           </div>
+                          
+                       </div>
+                   
+                       <!-- Members -->
+                       <div class="flex flex-col">
+                           <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                           <div class="mt-1">
+                               <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                   <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
+                                       <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                               </select>
+                           </div>
+                       </div>
+                   
+                      <!-- Start Date -->
+                       <div class="flex flex-col">
+                           <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                           <div class="mt-1">
+                               <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                           </div>
+                       </div>
+   
+                       <!-- End Date -->
+                       <div class="flex flex-col">
+                           <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                           <div class="mt-1">
+                               <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                           </div>
+                       </div>
+                       <div class="flex flex-col">
+                           <label class="block text-sm font-medium text-black">{{ form.is_active.label }}</label>
+                           <div class="mt-1 flex space-x-4">
+                               <!-- กำลังทำงาน -->
+                               <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                   กำลังทำงาน
+                               </span>
+                               
+                               <!-- ไม่ทำงาน -->
+                               <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                   ไม่ทำงาน
+                               </span>
+                           </div>
+                           <input type="hidden" id="is_active" name="is_active">
+                       </div>
+                       <!-- Submit Button -->
+                       <div class="flex justify-end">
+                           <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
+                               ยืนยันการสร้างงาน
+                           </button>
+                       </div>
+                  </form>
+                  </div>
+            </div>
+        </div>
+        <div class="flex flex-col col-span-2 justify-center w-1/2 bg-gradient-to-r from-red-300 to-red-200">
+            <div class="mx-10 flex justify-center gap-20">
+                <div class="w-1/2 bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-56 h-48 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                </div>
+                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-64 h-56 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                </div>
+            </div>
+            <div class="mx-10 flex justify-center gap-20 mt-16">  
+                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-64 h-56 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                </div>
+                <div class="bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-56 h-48 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                </div>
+                
+            </div>
+            <div class="mx-20 mt-12 flex justify-center gap-20 text-2xl">
+                <button class="w-64 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">โครงการ</button>
+                <button class="w-56 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">บุคลากร</button>
+            </div>
+
+        </div>
+    </div>
+
+        <!-- Move the script to the bottom of the body -->
+        <script>
+            // Function to open the popup
+            function openPopup() {
+                document.getElementById('projectModal').classList.remove('hidden');
+            }
+    
+            // Function to close the popup
+            function closePopup() {
+                document.getElementById('projectModal').classList.add('hidden');
+            }
+        </script>
+
+       <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Flatpickr สำหรับวันที่เริ่มต้น
+            flatpickr("#start_date", {
+                locale: "th", // ใช้ภาษาไทย
+                dateFormat: "d/m/Y", // ใช้รูปแบบ dd/mm/yyyy
+                onChange: function(selectedDates, dateStr, instance) {
+                    // เมื่อเลือกวันที่เริ่มต้นแล้ว ปรับปรุง minDate สำหรับวันที่สิ้นสุด
+                    document.getElementById('end_date')._flatpickr.set('minDate', selectedDates[0]);
+                }
+            });
+    
+            // Flatpickr สำหรับวันที่สิ้นสุด
+            flatpickr("#end_date", {
+                locale: "th", // ใช้ภาษาไทย
+                dateFormat: "d/m/Y", // ใช้รูปแบบ dd/mm/yyyy
+            });
+        });
+    </script>
+   <script>
+    // การกำหนดค่าให้เลือก
+    const workingOption = document.getElementById('working');
+    const notWorkingOption = document.getElementById('not_working');
+    const hiddenInput = document.getElementById('is_active');
+
+    // ฟังก์ชันเปลี่ยนสถานะเมื่อเลือกตัวใดตัวหนึ่ง
+    function selectOption(selected) {
+        if (selected === 'working') {
+            workingOption.classList.add('bg-blue-500', 'text-white');
+            notWorkingOption.classList.remove('bg-blue-500', 'text-white');
+            hiddenInput.value = 'working'; // กำหนดค่าให้ hidden input
+        } else if (selected === 'not_working') {
+            notWorkingOption.classList.add('bg-blue-500', 'text-white');
+            workingOption.classList.remove('bg-blue-500', 'text-white');
+            hiddenInput.value = 'not_working'; // กำหนดค่าให้ hidden input
+        }
+    }
+
+    // การคลิกที่ "กำลังทำงาน"
+    workingOption.addEventListener('click', function() {
+        selectOption('working');
+    });
+
+    // การคลิกที่ "ไม่ทำงาน"
+    notWorkingOption.addEventListener('click', function() {
+        selectOption('not_working');
+    });
+</script>
+    {% endblock %}
+
+
+</body>
+</html>

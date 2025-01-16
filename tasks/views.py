@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Project, Task, Notification
-from .forms import ProjectForm, TaskForm, UserCreateForm
+from .forms import *
 from .utils import create_notification
 # views.py or where you handle logic (e.g., after creating a notification)
 from .cosumers import NotificationConsumer
@@ -10,19 +10,9 @@ from .cosumers import NotificationConsumer
 
 
 def project_list(request):
-    projects = Project.objects.filter(members=request.user)
-    if request.method == 'POST':
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            new_project = form.save(commit=False)
-            new_project.created_by = request.user
-            new_project.save()
-            form.save_m2m()  # Save the many-to-many relationships (members)
-            return redirect('project_list')  # Redirect to the same page to show the new project
-    else:
-        form = ProjectForm()
+   
 
-    return render(request, 'tasks/project_list.html', {'projects': projects, 'form': form})
+    return render(request, 'tasks/project_list.html')
 
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)
