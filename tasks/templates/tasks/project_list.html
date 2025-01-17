@@ -11,7 +11,6 @@
         My Project
     {% endblock %}
    
-
 </head>
 <body>
     {% block content %}
@@ -79,7 +78,7 @@
                            <div class="mt-1">
                                <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                    <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
-                                       <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                                    <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
                                </select>
                            </div>
                        </div>
@@ -100,7 +99,7 @@
                            </div>
                        </div>
                        <div class="flex flex-col">
-                           <label class="block text-sm font-medium text-black">{{ form.is_active.label }}</label>
+                           <label class="block text-sm font-medium text-black">สถานะ</label>
                            <div class="mt-1 flex space-x-4">
                                <!-- กำลังทำงาน -->
                                <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
@@ -124,35 +123,59 @@
                   </div>
             </div>
         </div>
-        <div class="flex flex-col col-span-2 justify-center w-1/2 bg-gradient-to-r from-red-300 to-red-200">
+        <div class="flex flex-col col-span-2 justify-center w-1/2 bg-gradient-to-b from-blue-300 to-blue-100">
             <div class="mx-10 flex justify-center gap-12">
-                <div class=" bg-red-500 bg-opacity-65 backdrop-blur  md:w-48 h-44 py-3 text-white rounded-3xl">
+                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl">
                     <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[30px]">10</h1>
+                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px]" data-target="67">0</h1>
                 </div>
-                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur  md:w-56 h-52 py-3 text-white rounded-3xl">
+                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl">
                     <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[30px]">10</h1>
+                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px]" data-target="47">0</h1>
                 </div>
             </div>
-            <div class="mx-10 flex justify-center gap-12 mt-16">  
-                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-56 h-52 py-3 text-white rounded-3xl">
+            <div class="mx-10 flex justify-center gap-12 mt-16">
+                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl">
                     <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[30px]">10</h1>
+                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px]" data-target="45">0</h1>
                 </div>
-                <div class="bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-48 h-44 py-3 text-white rounded-3xl">
+                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl">
                     <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[30px]">10</h1>
+                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px]" data-target="50">0</h1>
                 </div>
-                
             </div>
-            <div class="mx-12 2xl:mx-24 mt-12 flex justify-center gap-20 text-2xl">
-                <button class="w-64 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">โครงการ</button>
-                <button class="w-56 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">บุคลากร</button>
+
+            <div class="mx-12 2xl:mx-44 mt-12 flex justify-center gap-20 text-2xl">
+                <button class="w-64 py-3 bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur  text-white rounded-2xl hover:scale-105 transition-all duration-400">โครงการ</button>
+                <button class="w-56 py-3 bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur  text-white rounded-2xl hover:scale-105 transition-all duration-400">บุคลากร</button>
             </div>
 
         </div>
     </div>
+
+    <script>
+        // JavaScript สำหรับเพิ่มเอฟเฟกต์การนับเลข
+        document.addEventListener('DOMContentLoaded', function () {
+            const counters = document.querySelectorAll('[data-target]'); // ค้นหากล่องที่มี data-target
+    
+            counters.forEach(counter => {
+                const updateCount = () => {
+                    const target = +counter.getAttribute('data-target'); // แปลงค่า target เป็นตัวเลข
+                    const current = +counter.innerText; // ดึงค่าปัจจุบันในกล่อง
+                    const increment = target / 100; // แบ่งการเพิ่มเป็น 100 ส่วน
+    
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current + increment); // เพิ่มค่าปัจจุบัน
+                        setTimeout(updateCount, 30); // เรียกฟังก์ชันซ้ำทุก 30ms
+                    } else {
+                        counter.innerText = target; // หากถึงเป้าหมายแล้ว ตั้งค่าเป็นเป้าหมาย
+                    }
+                };
+    
+                updateCount(); // เริ่มฟังก์ชันนับเลข
+            });
+        });
+    </script>
 
         <!-- Move the script to the bottom of the body -->
         <script>

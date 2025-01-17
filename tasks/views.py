@@ -122,3 +122,7 @@ def create_notification(user, message):
 
     # Trigger the real-time notification
     NotificationConsumer.send_notification_to_group(user.id, message)
+
+def employee(request):
+
+    return render(request, 'tasks/employee.html')

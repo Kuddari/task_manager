@@ -17,6 +17,8 @@ urlpatterns = [
     path('notifications/', notifications, name='notifications'),
     path('create_user/', create_user, name='create_user'),
     path('notifications/<int:pk>/read/', mark_notification_as_read, name='mark_notification_as_read'),
+    path('employee', employee, name='employee'),
+
 ]
 
 # WebSocket URL routing

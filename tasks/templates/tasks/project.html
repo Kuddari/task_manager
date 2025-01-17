@@ -22,28 +22,31 @@
                 <p class="text-lg">0 โครงการ</p>
             </div>
             <div class="mt-3 text-xl">
-                <button onclick="openPopup()" class="bg-blue-500 px-4 py-2 rounded-lg text-white">เพิ่มโครงการใหม่</button>
+                <button onclick="openProjectPopup()" class="bg-blue-500 px-4 py-2 rounded-lg text-white">เพิ่มโครงการใหม่</button>
             </div>
         </div>
 
         <div id="gridContainer" class="grid grid-cols-3 gap-8 m-8 bg-white">
             <div class="p-4 m-4 bg-slate-100 min-h-[180px] drop-shadow-md shadow-md relative">
-                <div class="flex justify-between gap-1 text-2xl">
-                    <a class="break-words" href="">งานวิจัยผลิตภั?ฮาลาลครั้งที่200 มหาวิทยาลัยฟาฏอนี</a>
+                <div class="flex justify-between gap-2 text-2xl">
+                    <button onclick="openProjectWorkPopup()" class="break-words text-left">งานวิจัยผลิตภั?ฮาลาลครั้งที่200 มหาวิทยาลัยฟาฏอนี</button>
             
-                    <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                        <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
-                    </svg>
-            
-                    <div id="editDeletePopup" class="hidden absolute top-14 left-0 right-0 z-50 max-w-xs sm:max-w-sm md:max-w-md w-52 mx-auto">
-                        <div class="bg-white bg-opacity-90 backdrop-blur py-2 px-4 rounded-lg shadow-lg">
-                            <div class="text-base">
-                                <button onclick="editProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
-                                <button onclick="deleteProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
+                    <div class="relative">
+                        <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                        </svg>
+                
+                        <div id="editDeletePopup" class="hidden absolute top-6 -left-40 right-0 z-50 w-40  ">
+                            <div class="bg-white bg-opacity-90 backdrop-blur py-4 px-4 rounded-lg shadow-lg">
+                                <div class="text-base">
+                                    <button onclick="openeditProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
+                                    <button onclick="opendeleteProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
                     <div class="flex flex-row justify-between mt-6 text-lg">
                         <div class="flex flex-row gap-4">
                             <h1 class="mb-1">ไอคอน</h1>
@@ -62,17 +65,114 @@
                     </div>
                 </div>
             </div>
-           
+        </div>
+
+        <!-- แก้ไขโปรเจ็ค -->        
+        <div id="Editproject" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+            <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
+                <div class="flex justify-between">
+                    <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
+                    <!-- Close Button -->
+                    <button onclick="closeeditProject()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                </div>
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- First Name -->
+                    <div class="flex flex-col">
+                        <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+                        <div class="mt-1">
+                            <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    
+                    </div>
+                
+                    <!-- Description -->
+                    <div class="flex flex-col">
+                        <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                        <div class="mt-1">
+                            <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
+                        </div>
+                    
+                    </div>
+                
+                    <!-- Members -->
+                    <div class="flex flex-col">
+                        <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                        <div class="mt-1">
+                            <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
+                                    <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                            </select>
+                        </div>
+                    </div>
+                
+                <!-- Start Date -->
+                    <div class="flex flex-col">
+                        <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                        <div class="mt-1">
+                            <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="flex flex-col">
+                        <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                        <div class="mt-1">
+                            <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="block text-sm font-medium text-black">สถานะ</label>
+                        <div class="mt-1 flex space-x-4">
+                            <!-- กำลังทำงาน -->
+                            <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                กำลังทำงาน
+                            </span>
+                            
+                            <!-- ไม่ทำงาน -->
+                            <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                ไม่ทำงาน
+                            </span>
+                        </div>
+                        <input type="hidden" id="is_active" name="is_active">
+                    </div>
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
+                            ยืนยันการสร้างงาน
+                        </button>
+                    </div>
+            </form>
+            </div>
+        </div>
+
+    <!-- ลบโปรเจ็ค -->
+     <div id="deleteProject" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+        <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80 ">
+            <div class="text-center">
+                <h3 class="text-lg">ยืนยันที่จะลบโครงการ</h3>
+            </div>
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+                <div class="flex justify-center gap-4">
+                    <button type="submit" class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg">
+                        ยืนยัน
+                    </button>
+                    <button type="button" onclick="closedeleteProject()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">ยกเลิก</button>
+
+                </div>
+            </form>
         </div>
     </div>
 
     <!-- Create New Project Form - Popup Modal -->
-    <div id="projectModal" class="z-50 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+    <div id="projectModal" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
         <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
             <div class="flex justify-between">
                 <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
                 <!-- Close Button -->
-                <button onclick="closePopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                <button onclick="closeProjectPopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
             </div>
             <form method="POST" enctype="multipart/form-data" class="space-y-6">
                 {% csrf_token %}
@@ -122,7 +222,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col">
-                    <label class="block text-sm font-medium text-black">{{ form.is_active.label }}</label>
+                    <label class="block text-sm font-medium text-black">สถานะ</label>
                     <div class="mt-1 flex space-x-4">
                         <!-- กำลังทำงาน -->
                         <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
@@ -145,23 +245,309 @@
            </form>
            </div>
      </div>
+
+     <div id="projectModal-Popup" class="hidden z-50 py-12 fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center  backdrop-blur drop-shadow-lg shadow-lg">
+        <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12">
+            <div class="flex justify-between bg-blue-500">
+                <div class="p-12 text-white">
+                    <h1 class="text-3xl font-semibold">งานวิจัยผลิตภัณฮาลาลครั้งที่200</h3>
+                    <h1 class="mt-2 text-xl">มีงานทั้งหมด 10 รายการ</h1>
+                </div>
+               <div class="text-white pt-4 text-right">
+                 <button onclick="closeProjectWorkPopup()" class="-mt-20 hover:scale-105 transition-all duration-400  px-4 py-2 text-white rounded-lg text-xl font-bold">X</button>
+                 <div class="mt-2 pr-16 text-xl">
+                    <h1 class="text-center">0%</h1>
+                    <h1>ความสำเร็จ</h1>
+                 </div>
+               </div>
+            </div>  
+            
+            <div class="flex flex-row justify-between my-8 mx-16">
+                <div class="flex flex-row gap-4 text-2xl ">
+                    <h1 class="text-black mt-1">งานทั้งหมด</h1>
+                    <button onclick="openAddPopupWork()" onclick="" class="bg-blue-500 rounded-md py-2 px-4 text-white text-lg">เพิ่มงาน</button>
+                </div>
+                <!-- เพิ่มงาน -->
+                <div>
+                    <div id="WorkModal-Popup" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+                        <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
+                            <div class="flex justify-between">
+                                <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
+                                <!-- Close Button -->
+                                <button onclick="closeAddPopupWork()" class=" hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                            </div>
+                            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                                {% csrf_token %}
+                                
+                                <!-- First Name -->
+                                <div class="flex flex-col">
+                                    <label for="name" class="block text-sm font-medium text-black">ชื่องาน'</label>
+                                    <div class="mt-1">
+                                        <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                   
+                                </div>
+                            
+                                <!-- Description -->
+                                <div class="flex flex-col">
+                                    <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                                    <div class="mt-1">
+                                        <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
+                                    </div>
+                                   
+                                </div>
+                            
+                                <!-- Members -->
+                                <div class="flex flex-col">
+                                    <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                                    <div class="mt-1">
+                                        <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                            <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
+                                                <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                                        </select>
+                                    </div>
+                                </div>
+                            
+                               <!-- Start Date -->
+                                <div class="flex flex-col">
+                                    <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                                    <div class="mt-1">
+                                        <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                </div>
+                
+                                <!-- End Date -->
+                                <div class="flex flex-col">
+                                    <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                                    <div class="mt-1">
+                                        <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                    </div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="block text-sm font-medium text-black">สถานะ</label>
+                                    <div class="mt-1 flex space-x-4">
+                                        <!-- กำลังทำงาน -->
+                                        <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                            กำลังทำงาน
+                                        </span>
+                                        
+                                        <!-- ไม่ทำงาน -->
+                                        <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                            ไม่ทำงาน
+                                        </span>
+                                    </div>
+                                    <input type="hidden" id="is_active" name="is_active">
+                                </div>
+                                <!-- Submit Button -->
+                                <div class="flex justify-end">
+                                    <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
+                                        ยืนยันการสร้างงาน
+                                    </button>
+                                </div>
+                           </form>
+                           </div>
+                     </div>
+                    
+                </div>
+                <div class="flex flex-row gap-4">
+                    <h1 class="text-2xl mt-1">ตัวกรองโดย</h1>
+                    <select id="members" name="members" class="w-40 text-center block p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                        <option value="" class="" disabled selected>เลือกตัวกรอง</option>  <!-- ตัวเลือกเริ่มต้น -->
+                        <option class="text-left" value="{{ member.id }}">ชื่อ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="mx-40 text-xl">
+                <div class="bg-slate-100 p-2 flex justify-between items-center rounded-lg drop-shadow-lg shadow-lg">
+                    <table class="table-auto w-full border-collapse">
+                        <thead class="bg-gray-100">
+                            <tr class="text-left">
+                                <th class="px-4 py-2 w-1/4">ชื่องาน</th> <!-- กำหนดให้ 25% ของความกว้างตาราง -->
+                                <th class="px-4 py-2 w-1/6">วันที่เริ่มต้น</th> <!-- กำหนด 16.67% -->
+                                <th class="px-4 py-2 w-1/6">วันที่สิ้นสุด</th> <!-- กำหนด 16.67% -->
+                                <th class="px-4 py-2 w-1/4">คนที่ส่งงาน</th> <!-- กำหนด 25% -->
+                                <th class="px-4 py-2 w-1/6">สถานะ</th> <!-- กำหนด 16.67% -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="px-4 py-2">งานวิจัย</td>
+                                <td class="px-4 py-2">10-10-2567</td>
+                                <td class="px-4 py-2">26-10-2567</td>
+                                <td class="px-4 py-2">สูไลมาน จะระแอ</td>
+                                <td class="px-4 py-2">กำลังทำ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    
+                          
+                    <div class="relative">
+                        <svg class="w-8 h-8 cursor-pointer z-10" onclick="openWorkPopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                            <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                        </svg>
+                        <div id="editPopuptwo" class="hidden absolute top-3 -left-[10.5rem] right-0 z-0 w-40 ">
+                            <div class="bg-white bg-opacity-90 backdrop-blur py-2 px-4 rounded-lg shadow-lg">
+                                <div class="text-base">
+                                    <button onclick="openeditWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
+                                    <button onclick="opendeleteWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- แก้ไขโปรเจ็ค -->        
+        <div id="EditWork" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+            <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
+                <div class="flex justify-between">
+                    <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
+                    <!-- Close Button -->
+                    <button onclick="closeeditWork()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                </div>
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <!-- First Name -->
+                    <div class="flex flex-col">
+                        <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+                        <div class="mt-1">
+                            <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    
+                    </div>
+                
+                    <!-- Description -->
+                    <div class="flex flex-col">
+                        <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                        <div class="mt-1">
+                            <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
+                        </div>
+                    
+                    </div>
+                
+                    <!-- Members -->
+                    <div class="flex flex-col">
+                        <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                        <div class="mt-1">
+                            <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
+                                    <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                            </select>
+                        </div>
+                    </div>
+                
+                <!-- Start Date -->
+                    <div class="flex flex-col">
+                        <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                        <div class="mt-1">
+                            <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    </div>
+
+                    <!-- End Date -->
+                    <div class="flex flex-col">
+                        <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                        <div class="mt-1">
+                            <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                        </div>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="block text-sm font-medium text-black">สถานะ</label>
+                        <div class="mt-1 flex space-x-4">
+                            <!-- กำลังทำงาน -->
+                            <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                กำลังทำงาน
+                            </span>
+                            
+                            <!-- ไม่ทำงาน -->
+                            <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
+                                ไม่ทำงาน
+                            </span>
+                        </div>
+                        <input type="hidden" id="is_active" name="is_active">
+                    </div>
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
+                            ยืนยันแก้ไขงาน
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+            <!-- ลบโปรเจ็ค -->
+        <div id="deleteWork" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+            <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80 ">
+                <div class="text-center">
+                    <h3 class="text-lg">ยืนยันที่จะลบโครงการ</h3>
+                </div>
+                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    <div class="flex justify-center gap-4">
+                        <button type="submit" class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg">
+                            ยืนยัน
+                        </button>
+                        <button type="button" onclick="closedeleteWork()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">ยกเลิก</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+     </div>
  </div>
 
  <!-- Move the script to the bottom of the body -->
+  <!-- เพิ่มโปรเจ็ค -->
  <script>
     // Function to open the popup
-     function openPopup() {
+     function openProjectPopup() {
          document.getElementById('projectModal').classList.remove('hidden');
          document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
      }
 
      // Function to close the popup
-     function closePopup() {
+     function closeProjectPopup() {
          document.getElementById('projectModal').classList.add('hidden');
          document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
      }
  </script>
 
+ <!-- เปิดหน้าโปรเจ็คแต่ละงาน -->
+ <script>
+    // Function to open the popup
+     function openProjectWorkPopup() {
+         document.getElementById('projectModal-Popup').classList.remove('hidden');
+         document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
+     }
+
+     // Function to close the popup
+     function closeProjectWorkPopup() {
+         document.getElementById('projectModal-Popup').classList.add('hidden');
+         document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
+     }
+ </script>
+
+<!-- เพิ่มงาน -->
+<script>
+    // Function to open the popup
+     function openAddPopupWork() {
+         document.getElementById('WorkModal-Popup').classList.remove('hidden');
+         document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
+     }
+
+     // Function to close the popup
+     function closeAddPopupWork() {
+         document.getElementById('WorkModal-Popup').classList.add('hidden');
+         document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
+     }
+ </script>
+
+
+<!-- เปิดปุ่มจัดการแก้ไขโปรเจ็ค -->
 <script>
     // Function to open/close the "แก้ไข" and "ลบงาน" popup
     function openEditDeletePopup(event) {
@@ -175,15 +561,25 @@
     }
     
     // Function for "แก้ไข" button (add functionality as needed)
-    function editProject() {
-        alert("Edit functionality goes here");
-        closeEditDeletePopup();
+    function openeditProject() {
+        document.getElementById('Editproject').classList.remove('hidden');
+        document.getElementById('editDeletePopup').classList.add('hidden');
+
     }
-    
+
+    function closeeditProject() {
+        document.getElementById('Editproject').classList.add('hidden');
+
+    }
+
     // Function for "ลบงาน" button (add functionality as needed)
-    function deleteProject() {
-        alert("Delete functionality goes here");
-        closeEditDeletePopup();
+    function opendeleteProject() {
+        document.getElementById('deleteProject').classList.remove('hidden');
+        document.getElementById('editDeletePopup').classList.add('hidden');
+
+    }
+    function closedeleteProject() {
+        document.getElementById('deleteProject').classList.add('hidden');
     }
     
     // Function to close the popup manually (optional)
@@ -191,6 +587,73 @@
         const popup = document.getElementById('editDeletePopup');
         popup.classList.add('hidden');
     }
+    </script>
+
+    <!-- แก้ไขงาน -->
+<script>
+    // Function to open/close the "แก้ไข" and "ลบงาน" popup
+    function openWorkPopup(event) {
+        const popup = document.getElementById('editPopuptwo');
+        
+        // Toggle the 'hidden' class to show/hide the popup
+        popup.classList.toggle('hidden');
+        
+        // Optionally, store the related project or item ID if needed
+        // event.target.closest('.project-item').id; // for example
+    }
+    
+    // Function for "แก้ไข" button (add functionality as needed)
+    function openeditWork() {
+        document.getElementById('EditWork').classList.remove('hidden');
+        document.getElementById('editPopuptwo').classList.add('hidden');
+
+    }
+
+    function closeeditWork() {
+        document.getElementById('EditWork').classList.add('hidden');
+    }
+
+    // Function for "ลบงาน" button (add functionality as needed)
+    function opendeleteWork() {
+        document.getElementById('deleteWork').classList.remove('hidden');
+        document.getElementById('editPopuptwo').classList.add('hidden');
+
+    }
+    function closedeleteWork() {
+        document.getElementById('deleteWork').classList.add('hidden');
+    }
+
+    </script>
+
+
+    <script>
+        // การกำหนดค่าให้เลือก
+        const workingOption = document.getElementById('working');
+        const notWorkingOption = document.getElementById('not_working');
+        const hiddenInput = document.getElementById('is_active');
+
+        // ฟังก์ชันเปลี่ยนสถานะเมื่อเลือกตัวใดตัวหนึ่ง
+        function selectOption(selected) {
+            if (selected === 'working') {
+                workingOption.classList.add('bg-blue-500', 'text-white');
+                notWorkingOption.classList.remove('bg-blue-500', 'text-white');
+                hiddenInput.value = 'working'; // กำหนดค่าให้ hidden input
+            } else if (selected === 'not_working') {
+                notWorkingOption.classList.add('bg-blue-500', 'text-white');
+                workingOption.classList.remove('bg-blue-500', 'text-white');
+                hiddenInput.value = 'not_working'; // กำหนดค่าให้ hidden input
+            }
+        }
+
+        // การคลิกที่ "กำลังทำงาน"
+        workingOption.addEventListener('click', function() {
+            selectOption('working');
+        });
+
+        // การคลิกที่ "ไม่ทำงาน"
+        notWorkingOption.addEventListener('click', function() {
+            selectOption('not_working');
+        });
     </script>
     {% endblock %}
 
