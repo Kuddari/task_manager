@@ -10,20 +10,12 @@
     {% block title %}
         My Project
     {% endblock %}
-    <style>
-        /* เพิ่มพื้นหลังเบลอ */
-        .backdrop-blur {
-            backdrop-filter: blur(5px); /* ทำให้พื้นหลังเบลอ */
-            -webkit-backdrop-filter: blur(5px); /* สำหรับเบราว์เซอร์ที่รองรับ */
-        }
-    
-
-    </style>
+   
 
 </head>
 <body>
     {% block content %}
-    <div class="flex flex-row min-h-screen">
+    <div class="flex flex-row min-h-screen ml-48">
         <div class="w-1/2 bg-slate-700 bg-cover bg-center min-h-screen" style="background-image: url('{% static "images/bg.jpg" %}');">
           
            <div class="pt-8 px-8">
@@ -53,7 +45,7 @@
           
    
            <!-- Create New Project Form - Popup Modal -->
-           <div id="projectModal" class="z-10 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+           <div id="projectModal" class="z-50 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
                <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
                    <div class="flex justify-between">
                        <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
@@ -76,7 +68,7 @@
                        <div class="flex flex-col">
                            <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
                            <div class="mt-1">
-                               <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="4"></textarea>
+                               <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
                            </div>
                           
                        </div>
@@ -133,28 +125,28 @@
             </div>
         </div>
         <div class="flex flex-col col-span-2 justify-center w-1/2 bg-gradient-to-r from-red-300 to-red-200">
-            <div class="mx-10 flex justify-center gap-20">
-                <div class="w-1/2 bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-56 h-48 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+            <div class="mx-10 flex justify-center gap-12">
+                <div class=" bg-red-500 bg-opacity-65 backdrop-blur  md:w-48 h-44 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[30px]">10</h1>
                 </div>
-                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-64 h-56 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur  md:w-56 h-52 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[30px]">10</h1>
                 </div>
             </div>
-            <div class="mx-10 flex justify-center gap-20 mt-16">  
-                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-64 h-56 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+            <div class="mx-10 flex justify-center gap-12 mt-16">  
+                <div class="bg-red-500 bg-opacity-65 -mt-4 backdrop-blur w-full md:w-56 h-52 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[30px]">10</h1>
                 </div>
-                <div class="bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-56 h-48 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[40px]">กำลังทำ</h1>
-                    <h1 class="text-center mt-4 text-[36px]">10</h1>
+                <div class="bg-red-500 bg-opacity-65 backdrop-blur w-full md:w-48 h-44 py-3 text-white rounded-3xl">
+                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
+                    <h1 class="text-center mt-4 text-[30px]">10</h1>
                 </div>
                 
             </div>
-            <div class="mx-20 mt-12 flex justify-center gap-20 text-2xl">
+            <div class="mx-12 2xl:mx-24 mt-12 flex justify-center gap-20 text-2xl">
                 <button class="w-64 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">โครงการ</button>
                 <button class="w-56 py-3 bg-red-500 bg-opacity-65 backdrop-blur  text-white rounded-2xl">บุคลากร</button>
             </div>
@@ -164,14 +156,16 @@
 
         <!-- Move the script to the bottom of the body -->
         <script>
-            // Function to open the popup
+           // Function to open the popup
             function openPopup() {
                 document.getElementById('projectModal').classList.remove('hidden');
+                document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
             }
-    
+
             // Function to close the popup
             function closePopup() {
                 document.getElementById('projectModal').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
             }
         </script>
 

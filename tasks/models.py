@@ -1,12 +1,21 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
+import hashlib
 
 
 class User(AbstractUser):
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
 
+class UserLogin(models.Model):
+    username = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)  # เก็บรหัสผ่านเป็นข้อความธรรมดา
+    login_time = models.DateTimeField(auto_now_add=True)
+    successful = models.BooleanField(default=True)
 
+    def __str__(self):
+        return f"Login Attempt for {self.username} at {self.login_time}"
+    
 class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

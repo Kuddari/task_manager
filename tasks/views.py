@@ -1,18 +1,69 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Project, Task, Notification
+from .models import *
 from .forms import *
 from .utils import create_notification
-# views.py or where you handle logic (e.g., after creating a notification)
+from django.contrib.auth import authenticate, login, logout
 from .cosumers import NotificationConsumer
+from django.utils.timezone import now
 
+def user_login(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('username')  # User ID input
+        password = request.POST.get('password')  # Password input
+
+        # ตรวจสอบว่าผู้ใช้มีในฐานข้อมูลหรือยัง
+        user = authenticate(request, username=user_id, password=password)
+
+        if user is not None:
+            # ถ้าผู้ใช้มีในระบบ ทำการล็อกอิน
+            login(request, user)
+
+            # Redirect ไปหน้าหลัก
+            return redirect('project_list')  # เปลี่ยน 'project_list' เป็น URL ของหน้าหลักของคุณ
+
+        else:
+            # ตรวจสอบในตาราง UserLogin ก่อนว่ามีข้อมูลนี้อยู่หรือไม่
+            if not UserLogin.objects.filter(username=user_id).exists():
+                # ถ้าไม่มีข้อมูลในตาราง UserLogin แสดงว่าการล็อกอินไม่สำเร็จ
+                return render(request, 'login.html', {
+                    'error_message': 'ท่านกรอกชื่อผู้ใช้หรือรหัสผ่านผิด',  # "Your account is not authorized to log in."
+                })
+
+            # ถ้าผู้ใช้ไม่มีในฐานข้อมูล User ให้สร้างผู้ใช้ใหม่
+            if not User.objects.filter(username=user_id).exists():
+                # สร้างผู้ใช้ใหม่
+                new_user = User(username=user_id)
+                new_user.set_password(password)  # เข้ารหัสรหัสผ่าน
+                new_user.save()
+
+                # ล็อกอินผู้ใช้ใหม่ที่สร้าง
+                user = authenticate(request, username=user_id, password=password)
+                if user is not None:
+                    login(request, user)
+                    return redirect('project_list')
+
+            # ถ้าการสร้างผู้ใช้ใหม่ล้มเหลว แสดงข้อความข้อผิดพลาด
+            return render(request, 'login.html', {
+                'error_message': 'ชื่อผู้ใช้หรือรหัสผ่านผิด',
+            })
+
+    return render(request, 'login.html')
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return redirect('login')  # เปลี่ยน 'login' เป็นชื่อ URL ของหน้า Login
 
 
 def project_list(request):
-   
 
     return render(request, 'tasks/project_list.html')
+
+def project(request):
+
+    return render(request, 'tasks/project.html')
 
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)

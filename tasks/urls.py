@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from .views import *
 from django.core.asgi import get_asgi_application
 from .cosumers import NotificationConsumer
 from django.urls import re_path
@@ -8,12 +8,15 @@ from channels.auth import AuthMiddlewareStack
 
 
 urlpatterns = [
-    path('', views.project_list, name='project_list'),
-    path('projects/<int:pk>/', views.project_detail, name='project_detail'),
-    path('tasks/create/', views.create_task, name='create_task'),
-    path('notifications/', views.notifications, name='notifications'),
-    path('create_user/', views.create_user, name='create_user'),
-    path('notifications/<int:pk>/read/', views.mark_notification_as_read, name='mark_notification_as_read'),
+    path('', user_login, name='login'),
+    path('logout/', user_logout, name='logout'),
+    path('project_list', project_list, name='project_list'),
+    path('project', project, name='project'),
+    path('projects/<int:pk>/', project_detail, name='project_detail'),
+    path('tasks/create/', create_task, name='create_task'),
+    path('notifications/', notifications, name='notifications'),
+    path('create_user/', create_user, name='create_user'),
+    path('notifications/<int:pk>/read/', mark_notification_as_read, name='mark_notification_as_read'),
 ]
 
 # WebSocket URL routing
