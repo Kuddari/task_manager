@@ -3,19 +3,66 @@ from django.db import models
 from django.utils import timezone
 import hashlib
 
-
 class User(AbstractUser):
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    """
+    AbstractUser already provides fields like:
+      - username
+      - password
+      - is_staff
+      - is_active
+      - is_superuser
+      - first_name
+      - last_name
+      - email
+      - last_login
+      - date_joined
+    """
+    profile_picture = models.ImageField(
+        upload_to='profile_pictures/', 
+        null=True, 
+        blank=True
+    )
+    profile = models.TextField(
+        null=True, 
+        blank=True, 
+        verbose_name="ประวัติ"
+    )
+    position = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        verbose_name="ตำแหน่ง"
+    )
+    faculty = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        verbose_name="คณะ"
+    )
+    major = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        verbose_name="สาขา"
+    )
+
+    def __str__(self):
+        return self.username
+
 
 class UserLogin(models.Model):
+    """
+    WARNING: Storing plain-text passwords is not secure.
+    This model is for demonstration or controlled environments.
+    """
     username = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)  # เก็บรหัสผ่านเป็นข้อความธรรมดา
+    password = models.CharField(max_length=255)  # Plain-text password (not recommended)
     login_time = models.DateTimeField(auto_now_add=True)
     successful = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Login Attempt for {self.username} at {self.login_time}"
-    
+
 class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()

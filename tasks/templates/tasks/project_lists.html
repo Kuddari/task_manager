@@ -10,6 +10,15 @@
     {% block title %}
         My Project
     {% endblock %}
+    <!-- 1) Include Tom Select CSS & JS (CDN example) -->
+    <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
+    />
+    <script
+    src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
+    </script>
+
    
 
 </head>
@@ -106,7 +115,8 @@
                             </select>
                         </div>
                     </div>
-                
+
+                    
                 <!-- Start Date -->
                     <div class="flex flex-col">
                         <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
@@ -166,85 +176,147 @@
         </div>
     </div>
 
-    <!-- Create New Project Form - Popup Modal -->
-    <div id="projectModal" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-        <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
-            <div class="flex justify-between">
-                <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
-                <!-- Close Button -->
-                <button onclick="closeProjectPopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
-            </div>
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                {% csrf_token %}
-                
-                <!-- First Name -->
-                <div class="flex flex-col">
-                    <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
-                    <div class="mt-1">
-                        <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                   
-                </div>
-            
-                <!-- Description -->
-                <div class="flex flex-col">
-                    <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
-                    <div class="mt-1">
-                        <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
-                    </div>
-                   
-                </div>
-            
-                <!-- Members -->
-                <div class="flex flex-col">
-                    <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
-                    <div class="mt-1">
-                        <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
-                                <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
-                        </select>
-                    </div>
-                </div>
-            
-               <!-- Start Date -->
-                <div class="flex flex-col">
-                    <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
-                    <div class="mt-1">
-                        <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                </div>
+   <!-- Create New Project Form - Popup Modal -->
+<div id="projectModal" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+    <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl">
+      <div class="flex justify-between">
+        <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
+        <button onclick="closeProjectPopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">
+          X
+        </button>
+      </div>
+      <!-- IMPORTANT: Add action to point to your view's URL -->
+      <form method="POST" action="{% url 'add_project' %}" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Project Name -->
+        <div class="flex flex-col">
+          <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+          <div class="mt-1">
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+            />
+          </div>
+        </div>
+        
+        <!-- Description -->
+        <div class="flex flex-col">
+          <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+          <div class="mt-1">
+            <textarea 
+              id="description" 
+              name="description"
+              class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+              rows="2"
+            ></textarea>
+          </div>
+        </div>
+  
+        
+        
+        <!-- 1) Include Tom Select CSS & JS (CDN example) -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
+        <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
-                <!-- End Date -->
-                <div class="flex flex-col">
-                    <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
-                    <div class="mt-1">
-                        <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                </div>
-                <div class="flex flex-col">
-                    <label class="block text-sm font-medium text-black">สถานะ</label>
-                    <div class="mt-1 flex space-x-4">
-                        <!-- กำลังทำงาน -->
-                        <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                            กำลังทำงาน
-                        </span>
-                        
-                        <!-- ไม่ทำงาน -->
-                        <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                            ไม่ทำงาน
-                        </span>
-                    </div>
-                    <input type="hidden" id="is_active" name="is_active">
-                </div>
-                <!-- Submit Button -->
-                <div class="flex justify-end">
-                    <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
-                        ยืนยันการสร้างงาน
-                    </button>
-                </div>
-           </form>
-           </div>
-     </div>
+        <!-- 2) Create a <select multiple> with your options -->
+            <select 
+            id="myMultiSelect"
+            name="members"
+            multiple 
+          >
+            {% for user in members %}
+              <option value="{{ user.id }}">
+                {{ user.first_name }} {{ user.last_name }}
+              </option>
+            {% endfor %}
+          </select>
+
+        <!-- 3) Initialize Tom Select -->
+        <script>
+        new TomSelect('#myMultiSelect', {
+            plugins: {
+            'checkbox_options': {} // This plugin shows checkboxes
+            },
+            placeholder: 'Select entity groups'
+        });
+        </script>
+
+    
+        
+        <!-- Start Date -->
+        <div class="flex flex-col">
+          <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+          <div class="mt-1">
+            <input 
+              type="text" 
+              id="start_date" 
+              name="start_date" 
+              placeholder="dd/mm/yyyy"
+              class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+            />
+          </div>
+        </div>
+  
+        <!-- End Date -->
+        <div class="flex flex-col">
+          <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+          <div class="mt-1">
+            <input 
+              type="text" 
+              id="end_date"
+              name="end_date"
+              placeholder="dd/mm/yyyy" 
+              class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+            />
+          </div>
+        </div>
+  
+        <!-- is_active -->
+        <div class="flex flex-col">
+          <label class="block text-sm font-medium text-black">สถานะ</label>
+          <div class="mt-1 flex space-x-4">
+            <!-- กำลังทำงาน -->
+            <span 
+              id="working"
+              onclick="document.getElementById('is_active').value='true'"
+              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+            >
+              กำลังทำงาน
+            </span>
+            
+            <!-- ไม่ทำงาน -->
+            <span 
+              id="not_working"
+              onclick="document.getElementById('is_active').value='false'"
+              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+            >
+              ไม่ทำงาน
+            </span>
+          </div>
+          <input 
+            type="hidden"
+            id="is_active"
+            name="is_active"
+            value="true"
+          />
+        </div>
+  
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+          <button 
+            type="submit" 
+            class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out"
+          >
+            ยืนยันการสร้างงาน
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
 
      <div id="projectModal-Popup" class="hidden z-50 py-12 fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center  backdrop-blur drop-shadow-lg shadow-lg">
         <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12">
@@ -499,9 +571,42 @@
         </div>
      </div>
  </div>
+ 
+ <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Flatpickr สำหรับวันที่เริ่มต้น
+        flatpickr("#start_date", {
+            locale: "th", // ใช้ภาษาไทย
+            dateFormat: "d/m/Y", // ใช้รูปแบบ dd/mm/yyyy
+            onChange: function(selectedDates, dateStr, instance) {
+                // เมื่อเลือกวันที่เริ่มต้นแล้ว ปรับปรุง minDate สำหรับวันที่สิ้นสุด
+                document.getElementById('end_date')._flatpickr.set('minDate', selectedDates[0]);
+            }
+        });
+
+        // Flatpickr สำหรับวันที่สิ้นสุด
+        flatpickr("#end_date", {
+            locale: "th", // ใช้ภาษาไทย
+            dateFormat: "d/m/Y", // ใช้รูปแบบ dd/mm/yyyy
+        });
+    });
+</script>
 
  <!-- Move the script to the bottom of the body -->
+  
   <!-- เพิ่มโปรเจ็ค -->
+
+  <!-- 3) Initialize Tom Select -->
+  <script>
+    new TomSelect('#myMultiSelect', {
+      plugins: {
+        'checkbox_options': {}  // The plugin that shows checkboxes
+      },
+      placeholder: 'Select members' // or 'เลือกสมาชิก'
+    });
+  </script>
+  
+
  <script>
     // Function to open the popup
      function openProjectPopup() {

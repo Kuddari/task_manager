@@ -962,10 +962,6 @@ select {
   margin-top: -5rem;
 }
 
-.-mt-4 {
-  margin-top: -1rem;
-}
-
 .mb-1 {
   margin-bottom: 0.25rem;
 }
@@ -1128,6 +1124,10 @@ select {
 
 .h-screen {
   height: 100vh;
+}
+
+.max-h-\[80vh\] {
+  max-height: 80vh;
 }
 
 .min-h-\[180px\] {
@@ -1477,25 +1477,9 @@ select {
   background-image: linear-gradient(to bottom, var(--tw-gradient-stops));
 }
 
-.bg-gradient-to-r {
-  background-image: linear-gradient(to right, var(--tw-gradient-stops));
-}
-
 .from-blue-300 {
   --tw-gradient-from: #93c5fd var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(147 197 253 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-blue-700 {
-  --tw-gradient-from: #1d4ed8 var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(29 78 216 / 0) var(--tw-gradient-to-position);
-  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
-}
-
-.from-blue-500 {
-  --tw-gradient-from: #3b82f6 var(--tw-gradient-from-position);
-  --tw-gradient-to: rgb(59 130 246 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
@@ -1507,18 +1491,6 @@ select {
 
 .to-blue-100 {
   --tw-gradient-to: #dbeafe var(--tw-gradient-to-position);
-}
-
-.to-blue-400 {
-  --tw-gradient-to: #60a5fa var(--tw-gradient-to-position);
-}
-
-.to-blue-600 {
-  --tw-gradient-to: #2563eb var(--tw-gradient-to-position);
-}
-
-.to-blue-300 {
-  --tw-gradient-to: #93c5fd var(--tw-gradient-to-position);
 }
 
 .bg-cover {
@@ -1829,11 +1801,6 @@ select {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
-.shadow-blue-700 {
-  --tw-shadow-color: #1d4ed8;
-  --tw-shadow: var(--tw-shadow-colored);
-}
-
 .shadow-blue-500 {
   --tw-shadow-color: #3b82f6;
   --tw-shadow: var(--tw-shadow-colored);
@@ -2133,10 +2100,6 @@ select {
 }
 
 @media (min-width: 1280px) {
-  .xl\:mt-4 {
-    margin-top: 1rem;
-  }
-
   .xl\:grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -2146,14 +2109,6 @@ select {
   .\32xl\:mx-44 {
     margin-left: 11rem;
     margin-right: 11rem;
-  }
-
-  .\32xl\:mt-8 {
-    margin-top: 2rem;
-  }
-
-  .\32xl\:mt-4 {
-    margin-top: 1rem;
   }
 
   .\32xl\:mt-12 {

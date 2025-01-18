@@ -4,6 +4,7 @@ from django.contrib import messages
 from .models import *
 from .forms import *
 from .utils import create_notification
+from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from .cosumers import NotificationConsumer
 from django.utils.timezone import now
@@ -57,13 +58,73 @@ def user_logout(request):
     return redirect('login')  # เปลี่ยน 'login' เป็นชื่อ URL ของหน้า Login
 
 
-def project_list(request):
+def project_lists(request):
 
     return render(request, 'tasks/project_list.html')
 
-def project(request):
+@login_required
+def add_project(request):
+    if request.method == 'POST':
+        # 1) Gather the posted form data
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        
+        # If the <select> can select multiple members, use getlist('members')
+        # If it's single selection, use get('members')
+        member_ids = request.POST.getlist('members')  # or request.POST.get('members')
+        
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+        
+        # Convert date strings (dd/mm/yyyy) to Python datetime
+        date_format = "%d/%m/%Y"
+        start_date = None
+        end_date = None
+        
+        if start_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, date_format)
+            except ValueError:
+                start_date = None
+        
+        if end_date_str:
+            try:
+                end_date = datetime.strptime(end_date_str, date_format)
+            except ValueError:
+                end_date = None
 
-    return render(request, 'tasks/project.html')
+        # is_active from hidden input (default to True if not found)
+        is_active_str = request.POST.get('is_active', 'true')
+        is_active = (is_active_str.lower() == 'true')
+        
+        # 2) Create the project
+        new_project = Project.objects.create(
+            name=name,
+            description=description,
+            created_by=request.user,   # The currently logged-in user
+            start_date=start_date,
+            end_date=end_date,
+            is_active=is_active
+        )
+        
+        # 3) Assign members (one or many). If your select is single, you'll have just one ID in member_ids.
+        for mid in member_ids:
+            try:
+                user_member = User.objects.get(pk=mid)
+                new_project.members.add(user_member)
+            except User.DoesNotExist:
+                pass  # Handle or ignore invalid user IDs
+        
+        # 4) Redirect (or show success message) after creation
+        return redirect('project_list')  # Change to your desired URL name
+
+    # If GET, show the form (or the page containing the modal) with a list of possible members
+    return redirect('project_list')
+   
+
+def project_list(request):
+    members = User.objects.all()
+    return render(request, 'tasks/project_lists.html', {'members': members})
 
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)
@@ -123,6 +184,46 @@ def create_notification(user, message):
     # Trigger the real-time notification
     NotificationConsumer.send_notification_to_group(user.id, message)
 
-def employee(request):
+def employee_list(request):
+    # Fetch all users from the database
+    employees = User.objects.all()
+    
+    # Pass the user list to the template
+    return render(request, 'tasks/employee.html', {'employees': employees})
 
-    return render(request, 'tasks/employee.html')
+def register_view(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        position = request.POST.get('position')
+        faculty = request.POST.get('faculty')
+        major = request.POST.get('major')
+        profile_picture = request.FILES.get('profile_picture')
+
+        # Create a new user using Django's create_user for proper password hashing
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            first_name=first_name or "",
+            last_name=last_name or ""
+        )
+        user.position = position
+        user.faculty = faculty
+        user.major = major
+
+        if profile_picture:
+            user.profile_picture = profile_picture
+        
+        user.save()
+
+        # (Optional) Automatically log the user in
+        # login(request, user)
+
+        # Redirect to some page after successful registration
+        return redirect('employee_list')
+
+    
+    # If it's a GET request, you can return a template (if needed)
+    return redirect('employee_list')
