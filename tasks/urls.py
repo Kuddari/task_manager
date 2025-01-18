@@ -13,6 +13,8 @@ urlpatterns = [
     path('logout/', user_logout, name='logout'),
     path('project_list', project_list, name='project_list'),
     path('project_list/add/', add_project, name='add_project'),
+    path('project_list/add-work/<int:pk>/', add_task, name='add_task'),
+
     path('project', project_lists, name='project'),
     path('projects/<int:pk>/', project_detail, name='project_detail'),
     path('tasks/create/', create_task, name='create_task'),

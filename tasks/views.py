@@ -8,6 +8,8 @@ from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
 from .cosumers import NotificationConsumer
 from django.utils.timezone import now
+from django.template.loader import render_to_string
+from django.http import JsonResponse
 
 def user_login(request):
     if request.method == 'POST':
@@ -121,16 +123,138 @@ def add_project(request):
     # If GET, show the form (or the page containing the modal) with a list of possible members
     return redirect('project_list')
    
-
 def project_list(request):
+    """
+    Show all projects (no selected project).
+    The modal will be hidden initially.
+    """
+    projects = Project.objects.all()
     members = User.objects.all()
-    return render(request, 'tasks/project_lists.html', {'members': members})
+    # 'selected_project' not set here
+    return render(request, 'tasks/project_lists.html', {
+        'projects': projects,
+        'members': members
+    })
 
 def project_detail(request, pk):
+    """
+    Show the same template, but with 'selected_project'
+    so the detail modal is OPENED automatically.
+    """
+    projects = Project.objects.all()
     project = get_object_or_404(Project, pk=pk)
     tasks = project.tasks.all()
-    return render(request, 'tasks/project_detail.html', {'project': project, 'tasks': tasks})
+    members = project.members.all()
 
+    # e.g. maybe tasks = project.tasks.all() if you have tasks
+    # For now, just pass 'project'
+    return render(request, 'tasks/project_lists.html', {
+        'projects': projects,          # grid
+        'members': members,
+        'tasks' : tasks,
+        'selected_project': project    # indicates we want the modal shown
+    })
+
+
+def add_task(request, pk):
+    """
+    Handle the POST form submission to create a new Task associated with a project.
+    """
+    project = get_object_or_404(Project, pk=pk)  # Get the project by ID
+
+    if request.method == 'POST':
+        # Gather form data
+        title = request.POST.get('title')
+        description = request.POST.get('description', '')
+        assigned_id = request.POST.get('assigned_to')
+        due_date_str = request.POST.get('due_date')
+        status_val = request.POST.get('status', 'to_do')  # Default to 'to_do'
+
+        # Convert due_date from string to datetime
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, "%d/%m/%Y")
+            except ValueError:
+                # Handle invalid date format if needed
+                pass
+
+        # Resolve the assigned User
+        assigned_user = None
+        if assigned_id:
+            assigned_user = User.objects.filter(pk=assigned_id).first()
+
+        # Create the Task
+        Task.objects.create(
+            title=title,
+            description=description,
+            assigned_to=assigned_user,
+            created_by=request.user,  # Currently logged-in user
+            project=project,  # Associate the task with the project
+            due_date=due_date,
+            status=status_val,
+        )
+
+        # Redirect to the project detail page
+        return redirect('project_detail', pk=pk)
+
+    # For non-POST requests, redirect back to the project detail page
+    return redirect('project_detail', pk=pk)
+
+def add_tasks(request, project_id):
+    """
+    Handle the POST form submission from 'WorkModal-Popup' to create a new Task.
+    """
+    if request.method == 'POST':
+        # 1) Get the project
+        project = get_object_or_404(Project, pk=project_id)
+
+        # 2) Gather form data
+        title = request.POST.get('title')
+        description = request.POST.get('description')
+        assigned_id = request.POST.get('assigned_to')
+        due_date_str = request.POST.get('due_date')  # Format: dd/mm/yyyy
+        status_val = request.POST.get('status', 'to_do')
+
+        # 3) Convert due_date from string to datetime
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, "%d/%m/%Y")
+            except ValueError:
+                due_date = None
+
+        # 4) Resolve the assigned User
+        assigned_user = None
+        if assigned_id:
+            try:
+                assigned_user = User.objects.get(pk=assigned_id)
+            except User.DoesNotExist:
+                assigned_user = None
+
+        # 5) Create the Task
+        new_task = Task.objects.create(
+            title=title,
+            description=description or "",
+            assigned_to=assigned_user,
+            created_by=request.user,
+            due_date=due_date,
+            status=status_val,
+            priority="Medium",
+            project=project,  # Associate with the selected project
+        )
+
+        # 6) Handle file attachment, if provided
+        attachment_file = request.FILES.get('attachment')
+        if attachment_file:
+            new_task.attachment = attachment_file
+            new_task.save(update_fields=['attachment'])
+
+        # 7) Redirect back to the project detail view
+        return redirect('project_detail', pk=project_id)
+
+    # If it's a GET request, redirect to the project list
+    return redirect('project_list')
 
 def create_task(request):
     if request.method == 'POST':

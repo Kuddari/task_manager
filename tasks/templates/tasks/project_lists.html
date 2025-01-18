@@ -35,47 +35,76 @@
             </div>
         </div>
 
+        <!-- Container for all project cards -->
         <div id="gridContainer" class="grid grid-cols-3 gap-8 m-8 bg-white">
+
+            {% for project in projects %}
             <div class="p-4 m-4 bg-slate-100 min-h-[180px] drop-shadow-md shadow-md relative">
                 <div class="flex justify-between gap-2 text-2xl">
-                    <button onclick="openProjectWorkPopup()" class="break-words text-left">งานวิจัยผลิตภั?ฮาลาลครั้งที่200 มหาวิทยาลัยฟาฏอนี</button>
+                <!-- Use the project's name in the button -->
+                <button 
+                onclick="location.href='{% url 'project_detail' project.pk %}';" 
+                class="break-words text-left"
+                >
+                    {{ project.name }}
+                </button>
             
-                    <div class="relative">
-                        <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                            <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
-                        </svg>
-                
-                        <div id="editDeletePopup" class="hidden absolute top-6 -left-40 right-0 z-50 w-40  ">
-                            <div class="bg-white bg-opacity-90 backdrop-blur py-4 px-4 rounded-lg shadow-lg">
-                                <div class="text-base">
-                                    <button onclick="openeditProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
-                                    <button onclick="opendeleteProject()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
-                                </div>
-                            </div>
+                <button 
+                    onclick="openProjectWorkPopup()" 
+                    class="break-words text-left"
+                >
+                    {{ project.name }}
+                </button>
+        
+                <div class="relative">
+                    <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                    </svg>
+        
+                    <div id="editDeletePopup" class="hidden absolute top-6 -left-40 right-0 z-50 w-40">
+                    <div class="bg-white bg-opacity-90 backdrop-blur py-4 px-4 rounded-lg shadow-lg">
+                        <div class="text-base">
+                        <button 
+                            onclick="openeditProject()" 
+                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2"
+                        >
+                            แก้ไข
+                        </button>
+                        <button 
+                            onclick="opendeleteProject()" 
+                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full"
+                        >
+                            ลบงาน
+                        </button>
                         </div>
+                    </div>
                     </div>
                 </div>
-
-                    <div class="flex flex-row justify-between mt-6 text-lg">
-                        <div class="flex flex-row gap-4">
-                            <h1 class="mb-1">ไอคอน</h1>
-                            <h1>ดำเนินการ</h1>
-                        </div>
-                        <div>
-                            <h1>10/10</h1>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                        <div class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" style="width: 45%"></div>
-                    </div>                    
-                    <div class="flex justify-end text-lg">
-                        <h1>สถานะ: <span>เสร็จสิ้น</span></h1>
-                    </div>
+                </div>
+        
+                <div class="flex flex-row justify-between mt-6 text-lg">
+                <div class="flex flex-row gap-4">
+                    <h1 class="mb-1">ไอคอน</h1>
+                    <h1>ดำเนินการ</h1>
+                </div>
+                <div>
+                    <h1>10/10</h1>
+                </div>
+                </div>
+        
+                <div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+                    <div class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" style="width: 45%"></div>
+                </div>
+                <div class="flex justify-end text-lg">
+                    <h1>สถานะ: <span>เสร็จสิ้น</span></h1>
+                </div>
                 </div>
             </div>
+            {% endfor %}
+        
         </div>
-
+  
         <!-- แก้ไขโปรเจ็ค -->        
         <div id="Editproject" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
             <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
@@ -318,15 +347,20 @@
   </div>
   
 
-     <div id="projectModal-Popup" class="hidden z-50 py-12 fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center  backdrop-blur drop-shadow-lg shadow-lg">
+     <div id="projectModal-Popup" class="{% if selected_project %}z-50 py-12 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center backdrop-blur drop-shadow-lg shadow-lg{% else %}hidden{% endif %}"
+     >
         <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12">
             <div class="flex justify-between bg-blue-500">
                 <div class="p-12 text-white">
-                    <h1 class="text-3xl font-semibold">งานวิจัยผลิตภัณฮาลาลครั้งที่200</h3>
-                    <h1 class="mt-2 text-xl">มีงานทั้งหมด 10 รายการ</h1>
+                    <h1 class="text-3xl font-semibold">{{ selected_project.name }}</h1>
+                    <h1 class="mt-2 text-xl">มีงานทั้งหมด {{ tasks|length }} รายการ</h1>
                 </div>
                <div class="text-white pt-4 text-right">
-                 <button onclick="closeProjectWorkPopup()" class="-mt-20 hover:scale-105 transition-all duration-400  px-4 py-2 text-white rounded-lg text-xl font-bold">X</button>
+                    <a href="{% url 'project_list' %}" 
+                    class="-mt-20 hover:scale-105 transition-all duration-400 px-4 py-2 text-white rounded-lg text-xl font-bold">
+                    X
+                </a>
+                
                  <div class="mt-2 pr-16 text-xl">
                     <h1 class="text-center">0%</h1>
                     <h1>ความสำเร็จ</h1>
@@ -335,93 +369,167 @@
             </div>  
             
             <div class="flex flex-row justify-between my-8 mx-16">
-                <div class="flex flex-row gap-4 text-2xl ">
+                <div class="flex flex-row gap-4 text-2xl">
                     <h1 class="text-black mt-1">งานทั้งหมด</h1>
-                    <button onclick="openAddPopupWork()" onclick="" class="bg-blue-500 rounded-md py-2 px-4 text-white text-lg">เพิ่มงาน</button>
-                </div>
-                <!-- เพิ่มงาน -->
-                <div>
-                    <div id="WorkModal-Popup" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-                        <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
-                            <div class="flex justify-between">
-                                <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
-                                <!-- Close Button -->
-                                <button onclick="closeAddPopupWork()" class=" hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                    <button
+                      onclick="openAddPopupWork()"
+                      class="bg-blue-500 rounded-md py-2 px-4 text-white text-lg"
+                    >
+                      เพิ่มงาน
+                    </button>
+                  </div>
+                  
+                  <!-- เพิ่มงาน -->
+                  <div>
+                    <div
+                      id="WorkModal-Popup"
+                      class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur"
+                    >
+                      <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <div class="flex justify-between">
+                          <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
+                          <!-- Close Button -->
+                          <button
+                            onclick="closeAddPopupWork()"
+                            class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg"
+                          >
+                            X
+                          </button>
+                        </div>
+                  
+                        <!-- Form: POST to add_task (adjust URL name if different) -->
+                        <form
+                        method="POST"
+                        action="{% if selected_project %}{% url 'add_task' selected_project.id %}{% else %}#{% endif %}"
+                        enctype="multipart/form-data"
+                        class="space-y-6"
+                        >
+
+                          {% csrf_token %}
+                  
+                          <!-- Title => Task.title -->
+                          <div class="flex flex-col">
+                            <label for="title" class="block text-sm font-medium text-black">ชื่องาน</label>
+                            <div class="mt-1">
+                              <input
+                                type="text"
+                                id="title"
+                                name="title"  
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                required
+                              />
                             </div>
-                            <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                                {% csrf_token %}
-                                
-                                <!-- First Name -->
-                                <div class="flex flex-col">
-                                    <label for="name" class="block text-sm font-medium text-black">ชื่องาน'</label>
-                                    <div class="mt-1">
-                                        <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                                    </div>
-                                   
-                                </div>
-                            
-                                <!-- Description -->
-                                <div class="flex flex-col">
-                                    <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
-                                    <div class="mt-1">
-                                        <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
-                                    </div>
-                                   
-                                </div>
-                            
-                                <!-- Members -->
-                                <div class="flex flex-col">
-                                    <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
-                                    <div class="mt-1">
-                                        <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                            <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
-                                                <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
-                                        </select>
-                                    </div>
-                                </div>
-                            
-                               <!-- Start Date -->
-                                <div class="flex flex-col">
-                                    <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
-                                    <div class="mt-1">
-                                        <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                                    </div>
-                                </div>
-                
-                                <!-- End Date -->
-                                <div class="flex flex-col">
-                                    <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
-                                    <div class="mt-1">
-                                        <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                                    </div>
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="block text-sm font-medium text-black">สถานะ</label>
-                                    <div class="mt-1 flex space-x-4">
-                                        <!-- กำลังทำงาน -->
-                                        <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                            กำลังทำงาน
-                                        </span>
-                                        
-                                        <!-- ไม่ทำงาน -->
-                                        <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                            ไม่ทำงาน
-                                        </span>
-                                    </div>
-                                    <input type="hidden" id="is_active" name="is_active">
-                                </div>
-                                <!-- Submit Button -->
-                                <div class="flex justify-end">
-                                    <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
-                                        ยืนยันการสร้างงาน
-                                    </button>
-                                </div>
-                           </form>
-                           </div>
-                     </div>
-                    
-                </div>
-                <div class="flex flex-row gap-4">
+                          </div>
+                  
+                          <!-- Description => Task.description -->
+                          <div class="flex flex-col">
+                            <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                            <div class="mt-1">
+                              <textarea
+                                id="description"
+                                name="description"  
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                rows="2"
+                              ></textarea>
+                            </div>
+                          </div>
+                  
+                          <!-- Assigned To => Task.assigned_to -->
+                          <div class="flex flex-col">
+                            <label for="assigned_to" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                            <div class="mt-1">
+                              <select
+                                id="assigned_to"
+                                name="assigned_to" 
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              >
+                                <option value="" disabled selected>เลือกสมาชิก</option>
+                                <!-- Loop over your actual members in the view: -->
+                                {% for member in members %}
+                                  <option value="{{ member.id }}">
+                                    {{ member.first_name }} {{ member.last_name }}
+                                  </option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          </div>
+    
+                          <!-- End Date => Task.due_date -->
+                          <div class="flex flex-col">
+                            <label for="due_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                            <div class="mt-1">
+                              <input
+                                type="text"
+                                id="end_date"
+                                name="due_date"
+                                placeholder="dd/mm/yyyy"
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                          </div>
+                  
+                          <!-- Status => Task.status -->
+                          <!-- "กำลังทำงาน" => 'in_progress', "ไม่ทำงาน" => 'to_do' -->
+                          <div class="flex flex-col">
+                            <label class="block text-sm font-medium text-black">สถานะ</label>
+                            <div class="mt-1 flex space-x-4">
+                              <!-- กำลังทำงาน -->
+                              <span
+                                id="working"
+                                class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+                              >
+                                กำลังทำงาน
+                              </span>
+                  
+                              <!-- ไม่ทำงาน -->
+                              <span
+                                id="not_working"
+                                class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+                              >
+                                ไม่ทำงาน
+                              </span>
+                            </div>
+                            <!-- Hidden input to store status -->
+                            <input
+                              type="hidden"
+                              id="task_status"
+                              name="status"
+                              value="to_do"
+                            />
+                          </div>
+                  
+                          <!-- (Optional) Attachment => Task.attachment -->
+                          <div class="flex flex-col">
+                            <label for="attachment" class="block text-sm font-medium text-black">ไฟล์แนบ</label>
+                            <div class="mt-1">
+                              <input
+                                type="file"
+                                id="attachment"
+                                name="attachment"  
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              />
+                            </div>
+                          </div>
+                  
+                          <!-- Submit Button -->
+                          <div class="flex justify-end">
+                            <button
+                              type="submit"
+                              class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out"
+                            >
+                              ยืนยันการสร้างงาน
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-row gap-4">
                     <h1 class="text-2xl mt-1">ตัวกรองโดย</h1>
                     <select id="members" name="members" class="w-40 text-center block p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                         <option value="" class="" disabled selected>เลือกตัวกรอง</option>  <!-- ตัวเลือกเริ่มต้น -->
@@ -435,21 +543,27 @@
                     <table class="table-auto w-full border-collapse">
                         <thead class="bg-gray-100">
                             <tr class="text-left">
-                                <th class="px-4 py-2 w-1/4">ชื่องาน</th> <!-- กำหนดให้ 25% ของความกว้างตาราง -->
-                                <th class="px-4 py-2 w-1/6">วันที่เริ่มต้น</th> <!-- กำหนด 16.67% -->
-                                <th class="px-4 py-2 w-1/6">วันที่สิ้นสุด</th> <!-- กำหนด 16.67% -->
-                                <th class="px-4 py-2 w-1/4">คนที่ส่งงาน</th> <!-- กำหนด 25% -->
-                                <th class="px-4 py-2 w-1/6">สถานะ</th> <!-- กำหนด 16.67% -->
+                                <th class="px-4 py-2 w-1/4">ชื่องาน</th>
+                                <th class="px-4 py-2 w-1/6">วันที่เริ่มต้น</th>
+                                <th class="px-4 py-2 w-1/6">วันที่สิ้นสุด</th>
+                                <th class="px-4 py-2 w-1/4">ผู้รับผิดชอบ</th>
+                                <th class="px-4 py-2 w-1/6">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {% for task in tasks %}
                             <tr>
-                                <td class="px-4 py-2">งานวิจัย</td>
-                                <td class="px-4 py-2">10-10-2567</td>
-                                <td class="px-4 py-2">26-10-2567</td>
-                                <td class="px-4 py-2">สูไลมาน จะระแอ</td>
-                                <td class="px-4 py-2">กำลังทำ</td>
+                                <td class="px-4 py-2">{{ task.title }}</td>
+                                <td class="px-4 py-2">{{ task.created_at|date:"d/m/Y" }}</td>
+                                <td class="px-4 py-2">{{ task.due_date|date:"d/m/Y" }}</td>
+                                <td class="px-4 py-2">{{ task.assigned_to }}</td>
+                                <td class="px-4 py-2">{{ task.get_status_display }}</td>
                             </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-4">ยังไม่มีงานในโครงการนี้</td>
+                            </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
                     
