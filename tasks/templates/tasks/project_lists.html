@@ -19,6 +19,7 @@
     src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
     </script>
 
+
    
 
 </head>
@@ -28,7 +29,7 @@
         <div class="flex px-12 py-4 gap-x-8 bg-white">
             <div class="">
                 <h1 class="text-3xl">โครงการ</h1>
-                <p class="text-lg">0 โครงการ</p>
+                <p class="text-lg">{{ projects|length }} โครงการ</p>
             </div>
             <div class="mt-3 text-xl">
                 <button onclick="openProjectPopup()" class="bg-blue-500 px-4 py-2 rounded-lg text-white">เพิ่มโครงการใหม่</button>
@@ -48,38 +49,8 @@
                 >
                     {{ project.name }}
                 </button>
-            
-                <button 
-                    onclick="openProjectWorkPopup()" 
-                    class="break-words text-left"
-                >
-                    {{ project.name }}
-                </button>
-        
-                <div class="relative">
-                    <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                    <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
-                    </svg>
-        
-                    <div id="editDeletePopup" class="hidden absolute top-6 -left-40 right-0 z-50 w-40">
-                    <div class="bg-white bg-opacity-90 backdrop-blur py-4 px-4 rounded-lg shadow-lg">
-                        <div class="text-base">
-                        <button 
-                            onclick="openeditProject()" 
-                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2"
-                        >
-                            แก้ไข
-                        </button>
-                        <button 
-                            onclick="opendeleteProject()" 
-                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full"
-                        >
-                            ลบงาน
-                        </button>
-                        </div>
-                    </div>
-                    </div>
-                </div>
+             
+                
                 </div>
         
                 <div class="flex flex-row justify-between mt-6 text-lg">
@@ -88,16 +59,20 @@
                     <h1>ดำเนินการ</h1>
                 </div>
                 <div>
-                    <h1>10/10</h1>
+                  <h1>{{ project.completed_tasks }}/{{ project.total_tasks }}</h1>
                 </div>
                 </div>
         
                 <div>
                 <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
-                    <div class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" style="width: 45%"></div>
+                    <div class="bg-blue-600 h-2.5 rounded-full dark:bg-blue-500" style="width: {{ project.completion_percentage }}%"></div>
                 </div>
                 <div class="flex justify-end text-lg">
-                    <h1>สถานะ: <span>เสร็จสิ้น</span></h1>
+                  <h1>สถานะ: 
+                    <span>
+                        {% if project.completion_percentage == 100 %}เสร็จสิ้น{% else %}กำลังดำเนินการ{% endif %}
+                    </span>
+                  </h1>
                 </div>
                 </div>
             </div>
@@ -361,10 +336,52 @@
                     X
                 </a>
                 
-                 <div class="mt-2 pr-16 text-xl">
-                    <h1 class="text-center">0%</h1>
-                    <h1>ความสำเร็จ</h1>
-                 </div>
+                 <!-- Circle Progress Bar -->
+                 <div class="flex items-center justify-center w-[100px] h-[100px]">
+                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <!-- Background Circle -->
+                    <circle
+                      class="fill-none stroke-gray-300" <!-- Equivalent to `fill: none; stroke: #e6e6e6;` -->
+                      cx="18"
+                      cy="18"
+                      r="15.91549431"
+                      stroke-width="3.8"
+                    ></circle>
+                
+                    <!-- Progress Circle -->
+                    <circle
+                      class="fill-none stroke-green-500 transition-[stroke-dasharray] duration-600 ease-in-out"
+                      cx="18"
+                      cy="18"
+                      r="15.91549431"
+                      style="stroke-dasharray: {{ selected_project.completion_percentage }}, 100"
+                      stroke-width="3.8"
+                      stroke-linecap="round"
+                    ></circle>
+                
+                    <!-- Background for Text -->
+                    <circle
+                      class="fill-gray-300"
+                      cx="18"
+                      cy="18"
+                      r="10"
+                    ></circle>
+                
+                    <!-- Percentage Text -->
+                    <text
+                      class="fill-green-500 font-bold text-[0.5em]" <!-- Equivalent to smaller font size and green text -->
+                      x="18"
+                      y="18"
+                      text-anchor="middle"
+                      dominant-baseline="central"
+                    >
+                      {{ selected_project.completion_percentage|floatformat:0 }}%
+                    </text>
+                  </svg>
+                </div>
+                
+                
+               
                </div>
             </div>  
             

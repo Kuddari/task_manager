@@ -10,6 +10,7 @@ from .cosumers import NotificationConsumer
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.db.models import Count, Q
 
 def user_login(request):
     if request.method == 'POST':
@@ -24,7 +25,7 @@ def user_login(request):
             login(request, user)
 
             # Redirect ไปหน้าหลัก
-            return redirect('project_list')  # เปลี่ยน 'project_list' เป็น URL ของหน้าหลักของคุณ
+            return redirect('project')  # เปลี่ยน 'project_list' เป็น URL ของหน้าหลักของคุณ
 
         else:
             # ตรวจสอบในตาราง UserLogin ก่อนว่ามีข้อมูลนี้อยู่หรือไม่
@@ -45,7 +46,7 @@ def user_login(request):
                 user = authenticate(request, username=user_id, password=password)
                 if user is not None:
                     login(request, user)
-                    return redirect('project_list')
+                    return redirect('project')
 
             # ถ้าการสร้างผู้ใช้ใหม่ล้มเหลว แสดงข้อความข้อผิดพลาด
             return render(request, 'login.html', {
@@ -125,35 +126,46 @@ def add_project(request):
    
 def project_list(request):
     """
-    Show all projects (no selected project).
-    The modal will be hidden initially.
+    Show all projects with task completion statistics.
     """
-    projects = Project.objects.all()
+    projects = Project.objects.annotate(
+        total_tasks=Count('tasks'),
+        completed_tasks=Count('tasks', filter=Q(tasks__status='done')),
+    )
+
+    # Add completion percentage for each project
+    for project in projects:
+        project.completion_percentage = (
+            (project.completed_tasks / project.total_tasks * 100)
+            if project.total_tasks > 0 else 0
+        )
+
     members = User.objects.all()
-    # 'selected_project' not set here
+
     return render(request, 'tasks/project_lists.html', {
         'projects': projects,
         'members': members
     })
 
 def project_detail(request, pk):
-    """
-    Show the same template, but with 'selected_project'
-    so the detail modal is OPENED automatically.
-    """
     projects = Project.objects.all()
     project = get_object_or_404(Project, pk=pk)
     tasks = project.tasks.all()
     members = project.members.all()
+    
+    # Calculate completion percentage
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(status='done').count()  # Assuming 'done' is the status for completed
+    completion_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+    project.completion_percentage = round(completion_percentage, 2)
 
-    # e.g. maybe tasks = project.tasks.all() if you have tasks
-    # For now, just pass 'project'
     return render(request, 'tasks/project_lists.html', {
-        'projects': projects,          # grid
+        'projects': projects,
         'members': members,
-        'tasks' : tasks,
-        'selected_project': project    # indicates we want the modal shown
+        'tasks': tasks,
+        'selected_project': project
     })
+
 
 
 def add_task(request, pk):

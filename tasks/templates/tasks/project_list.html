@@ -146,7 +146,8 @@
             </div>
 
             <div class="mx-12 2xl:mx-44 mt-12 flex justify-center gap-20 text-2xl">
-                <button class="w-64 py-3 bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur  text-white rounded-2xl hover:scale-105 transition-all duration-400">โครงการ</button>
+                <button onclick="location.href='{% url 'project_list' %}'"  
+                class="w-64 py-3 bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur  text-white rounded-2xl hover:scale-105 transition-all duration-400">โครงการ</button>
                 <button  onclick="location.href='{% url 'employee_list' %}'"  
                  class="w-56 py-3 bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur  text-white rounded-2xl hover:scale-105 transition-all duration-400">บุคลากร</button>
             </div>
