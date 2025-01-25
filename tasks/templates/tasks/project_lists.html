@@ -10,17 +10,9 @@
     {% block title %}
         My Project
     {% endblock %}
-    <!-- 1) Include Tom Select CSS & JS (CDN example) -->
-    <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css"
-    />
-    <script
-    src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js">
-    </script>
 
-
-   
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
+     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
 </head>
 <body>
@@ -41,16 +33,42 @@
 
             {% for project in projects %}
             <div class="p-4 m-4 bg-slate-100 min-h-[180px] drop-shadow-md shadow-md relative">
-                <div class="flex justify-between gap-2 text-2xl">
-                <!-- Use the project's name in the button -->
-                <button 
-                onclick="location.href='{% url 'project_detail' project.pk %}';" 
-                class="break-words text-left"
-                >
-                    {{ project.name }}
-                </button>
-             
+              <div class="flex justify-between gap-2 text-2xl">
+                  <!-- Use the project's name in the button -->
+                  <button 
+                      onclick="location.href='{% url 'project_detail' project.pk %}';" 
+                      class="truncate w-full text-left break-words"
+                      title="{{ project.name }}"
+                  >
+                      {{ project.name }}
+                  </button>
+            
                 
+        
+                <div class="relative">
+                    <svg class="w-8 h-8 cursor-pointer" onclick="openEditDeletePopup{{project.id}}(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                    <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                    </svg>
+        
+                    <div id="editDeletePopup{{project.id}}" class="hidden absolute top-6 -left-40 right-0 z-50 w-40">
+                    <div class="bg-white bg-opacity-90 backdrop-blur py-4 px-4 rounded-lg shadow-lg">
+                        <div class="text-base">
+                        <button 
+                            onclick="openeditProject{{project.id}}()" 
+                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2"
+                        >
+                            แก้ไข
+                        </button>
+                        <button 
+                            onclick="opendeleteProject{{project.id}}()" 
+                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full"
+                        >
+                            ลบงาน
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
                 </div>
         
                 <div class="flex flex-row justify-between mt-6 text-lg">
@@ -80,105 +98,181 @@
         
         </div>
   
-        <!-- แก้ไขโปรเจ็ค -->        
-        <div id="Editproject" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-            <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
-                <div class="flex justify-between">
-                    <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
-                    <!-- Close Button -->
-                    <button onclick="closeeditProject()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
-                </div>
-                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- แก้ไขโปรเจ็ค -->
+        {% for project in projects %}
+  
+          <div id="Editproject{{project.id}}" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+              <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl min-h-[500px] max-h-[600px] overflow-auto">
+                  <div class="flex justify-between">
+                      <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
+                      <!-- Close Button -->
+                      <button onclick="closeeditProject{{project.id}}()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                  </div>
+                  <form method="POST" enctype="multipart/form-data" action="{% url 'edit_project' project.id %}" class="space-y-6">
                     {% csrf_token %}
                     
-                    <!-- First Name -->
+                    <!-- Project Name -->
                     <div class="flex flex-col">
-                        <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+                        <label for="name_{{ project.id }}" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
                         <div class="mt-1">
-                            <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input 
+                                type="text" 
+                                id="name_{{ project.id }}" 
+                                name="name" 
+                                value="{{ project.name }}" 
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                required 
+                            />
                         </div>
-                    
                     </div>
-                
+                    
                     <!-- Description -->
                     <div class="flex flex-col">
-                        <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                        <label for="description_{{ project.id }}" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
                         <div class="mt-1">
-                            <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
+                            <textarea 
+                                id="description_{{ project.id }}" 
+                                name="description" 
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                rows="3" 
+                                required
+                            >{{ project.description }}</textarea>
                         </div>
-                    
                     </div>
-                
-                    <!-- Members -->
-                    <div class="flex flex-col">
-                        <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+
+                    <!-- 1) Include Tom Select CSS & JS (CDN example) -->
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
+                    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+                    <!-- Project Members -->
+                      <div class="flex flex-col">
+                        <label for="editMultiSelect_{{ project.id }}" class="block text-sm font-medium text-black">สมาชิกในโครงการ</label>
                         <div class="mt-1">
-                            <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
-                                    <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
+                            <select 
+                                id="editMultiSelect_{{ project.id }}" 
+                                name="edit_members" 
+                                multiple
+                                class="block w-full"
+                            >
+                                {% for user in members %}
+                                    <option 
+                                        value="{{ user.id }}" 
+                                        {% if user in project.members.all %} selected {% endif %}
+                                    >
+                                        {{ user.first_name }} {{ user.last_name }}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
-
-                    
-                <!-- Start Date -->
+                    <!-- 3) Initialize Tom Select -->
+                    <script>
+                      document.addEventListener('DOMContentLoaded', function () {
+                          {% for project in projects %}
+                          // Initialize Tom Select for each project dynamically
+                          new TomSelect('#editMultiSelect_{{ project.id }}', {
+                              plugins: {
+                                  'checkbox_options': {}
+                              },
+                              placeholder: 'Select members'
+                          });
+                          {% endfor %}
+                      });
+                  </script>
+              
+                    <!-- Start Date -->
                     <div class="flex flex-col">
-                        <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                        <label for="start_date_{{ project.id }}" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
                         <div class="mt-1">
-                            <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input 
+                                type="text" 
+                                id="start_date_{{ project.id }}" 
+                                name="start_date" 
+                                placeholder="dd/mm/yyyy" 
+                                value="{{ project.start_date|date:'d/m/Y' }}" 
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                required 
+                            />
                         </div>
                     </div>
-
+                    
                     <!-- End Date -->
                     <div class="flex flex-col">
-                        <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                        <label for="end_date_{{ project.id }}" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
                         <div class="mt-1">
-                            <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                            <input 
+                                type="text" 
+                                id="end_date_{{ project.id }}" 
+                                name="end_date" 
+                                placeholder="dd/mm/yyyy" 
+                                value="{{ project.end_date|date:'d/m/Y' }}" 
+                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                                required 
+                            />
                         </div>
                     </div>
+                    
+                    <!-- Status -->
                     <div class="flex flex-col">
-                        <label class="block text-sm font-medium text-black">สถานะ</label>
-                        <div class="mt-1 flex space-x-4">
-                            <!-- กำลังทำงาน -->
-                            <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                กำลังทำงาน
-                            </span>
-                            
-                            <!-- ไม่ทำงาน -->
-                            <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                ไม่ทำงาน
-                            </span>
-                        </div>
-                        <input type="hidden" id="is_active" name="is_active">
-                    </div>
+                      <label class="block text-sm font-medium text-black">สถานะ</label>
+                      <div class="mt-1 flex space-x-4">
+                          <!-- Working -->
+                          <span 
+                              id="working_{{ project.id }}" 
+                              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 {% if project.is_active %}text-blue-600 bg-blue-100{% endif %}" 
+                              onclick="setStatus('{{ project.id }}', true)"
+                          >
+                              กำลังทำงาน
+                          </span>
+                  
+                          <!-- Not Working -->
+                          <span 
+                              id="not_working_{{ project.id }}" 
+                              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 {% if not project.is_active %}text-blue-600 bg-blue-100{% endif %}" 
+                              onclick="setStatus('{{ project.id }}', false)"
+                          >
+                              ไม่ทำงาน
+                          </span>
+                      </div>
+                      <input type="hidden" id="is_active_{{ project.id }}" name="is_active" value="{{ project.is_active|yesno:'true,false' }}">
+                  </div>
+                  
+                    
                     <!-- Submit Button -->
                     <div class="flex justify-end">
-                        <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
-                            ยืนยันการสร้างงาน
+                        <button 
+                            type="submit" 
+                            class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out"
+                        >
+                            ยืนยันการแก้ไขงาน
                         </button>
                     </div>
-            </form>
-            </div>
-        </div>
+                </form>
+              </div>
+          </div>
 
-    <!-- ลบโปรเจ็ค -->
-     <div id="deleteProject" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-        <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80 ">
+
+      <!-- ลบโปรเจ็ค -->
+      <div id="deleteProject{{ project.id }}" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+        <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80">
             <div class="text-center">
                 <h3 class="text-lg">ยืนยันที่จะลบโครงการ</h3>
             </div>
-            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form method="POST" action="{% url 'delete_project' project.id %}" class="space-y-6">
                 {% csrf_token %}
                 <div class="flex justify-center gap-4">
                     <button type="submit" class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg">
                         ยืนยัน
                     </button>
-                    <button type="button" onclick="closedeleteProject()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">ยกเลิก</button>
-
+                    <button type="button" onclick="closedeleteProject({{ project.id }})" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">
+                        ยกเลิก
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+    
+    {% endfor %}
+
 
    <!-- Create New Project Form - Popup Modal -->
 <div id="projectModal" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
@@ -221,10 +315,10 @@
   
         
         
-        <!-- 1) Include Tom Select CSS & JS (CDN example) -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
-        <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
-
+       <!-- 1) Include Tom Select CSS & JS (CDN example) -->
+       <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.css">
+       <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
+       
         <!-- 2) Create a <select multiple> with your options -->
             <select 
             id="myMultiSelect"
@@ -278,35 +372,35 @@
           </div>
         </div>
   
-        <!-- is_active -->
         <div class="flex flex-col">
           <label class="block text-sm font-medium text-black">สถานะ</label>
           <div class="mt-1 flex space-x-4">
             <!-- กำลังทำงาน -->
             <span 
-              id="working"
-              onclick="document.getElementById('is_active').value='true'"
-              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+              id="working" 
+              onclick="setAddProjectStatus(true)" 
+              class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 text-blue-600 bg-blue-100"
             >
               กำลังทำงาน
             </span>
             
             <!-- ไม่ทำงาน -->
             <span 
-              id="not_working"
-              onclick="document.getElementById('is_active').value='false'"
+              id="not_working" 
+              onclick="setAddProjectStatus(false)" 
               class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
             >
               ไม่ทำงาน
             </span>
           </div>
           <input 
-            type="hidden"
-            id="is_active"
-            name="is_active"
-            value="true"
+            type="hidden" 
+            id="is_active" 
+            name="is_active" 
+            value="true" 
           />
         </div>
+        
   
         <!-- Submit Button -->
         <div class="flex justify-end">
@@ -324,7 +418,7 @@
 
      <div id="projectModal-Popup" class="{% if selected_project %}z-50 py-12 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center backdrop-blur drop-shadow-lg shadow-lg{% else %}hidden{% endif %}"
      >
-        <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12">
+        <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12 overflow-y-auto">
             <div class="flex justify-between bg-blue-500">
                 <div class="p-12 text-white">
                     <h1 class="text-3xl font-semibold">{{ selected_project.name }}</h1>
@@ -337,15 +431,16 @@
                 </a>
                 
                  <!-- Circle Progress Bar -->
-                 <div class="flex items-center justify-center w-[100px] h-[100px]">
-                  <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                 <div class="flex items-center justify-center w-[90px] h-[90px] mr-12">
+                  <svg class="w-full h-full" viewBox="0 0 36 36">
                     <!-- Background Circle -->
                     <circle
-                      class="fill-none stroke-gray-300" <!-- Equivalent to `fill: none; stroke: #e6e6e6;` -->
+                      class="fill-none stroke-gray-300" 
                       cx="18"
                       cy="18"
                       r="15.91549431"
                       stroke-width="3.8"
+                      transform="rotate(-90 18 18)"
                     ></circle>
                 
                     <!-- Progress Circle -->
@@ -357,19 +452,20 @@
                       style="stroke-dasharray: {{ selected_project.completion_percentage }}, 100"
                       stroke-width="3.8"
                       stroke-linecap="round"
+                      transform="rotate(-90 18 18)"
                     ></circle>
                 
                     <!-- Background for Text -->
                     <circle
-                      class="fill-gray-300"
+                      class="fill-white"
                       cx="18"
                       cy="18"
-                      r="10"
+                      r="14.2"
                     ></circle>
                 
                     <!-- Percentage Text -->
                     <text
-                      class="fill-green-500 font-bold text-[0.5em]" <!-- Equivalent to smaller font size and green text -->
+                      class="fill-green-500 font-bold text-[0.5em]"
                       x="18"
                       y="18"
                       text-anchor="middle"
@@ -379,9 +475,6 @@
                     </text>
                   </svg>
                 </div>
-                
-                
-               
                </div>
             </div>  
             
@@ -492,23 +585,26 @@
                           <!-- Status => Task.status -->
                           <!-- "กำลังทำงาน" => 'in_progress', "ไม่ทำงาน" => 'to_do' -->
                           <div class="flex flex-col">
-                            <label class="block text-sm font-medium text-black">สถานะ</label>
-                            <div class="mt-1 flex space-x-4">
-                              <!-- กำลังทำงาน -->
-                              <span
-                                id="working"
-                                class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
-                              >
-                                กำลังทำงาน
-                              </span>
-                  
-                              <!-- ไม่ทำงาน -->
-                              <span
-                                id="not_working"
-                                class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
-                              >
-                                ไม่ทำงาน
-                              </span>
+                            <div>
+                              <label class="block text-sm font-medium text-black">สถานะ</label>
+                              <div class="mt-1 flex space-x-4">
+                                  <button 
+                                      type="button"
+                                      id="in_progress" 
+                                      data-status="in_progress"
+                                      class="status-btn px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+                                  >
+                                      กำลังดำเนินการ
+                                  </button>
+                                  <button 
+                                      type="button"
+                                      id="done" 
+                                      data-status="done"
+                                      class="status-btn px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100"
+                                  >
+                                      เสร็จสิ้น
+                                  </button>
+                              </div>
                             </div>
                             <!-- Hidden input to store status -->
                             <input
@@ -547,139 +643,238 @@
                     </div>
                   </div>
                   <div class="flex flex-row gap-4">
-                    <h1 class="text-2xl mt-1">ตัวกรองโดย</h1>
-                    <select id="members" name="members" class="w-40 text-center block p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                        <option value="" class="" disabled selected>เลือกตัวกรอง</option>  <!-- ตัวเลือกเริ่มต้น -->
-                        <option class="text-left" value="{{ member.id }}">ชื่อ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
-                    </select>
+                    <h1 class="text-2xl mt-1">ตัวกรอง</h1>
+    
+                <!-- Filter by Member -->
+                <select 
+                    id="filter_member" 
+                    name="member" 
+                    class="w-40 text-center block p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                    onchange="applyFilters()"
+                >
+                    <!-- Option for all members -->
+                    <option value="all" {% if not member_filter or member_filter == "all" %} selected {% endif %}>สมาชิกทุกคน</option>
+
+                    <!-- Options for individual members -->
+                    {% for member in members %}
+                        <option 
+                            value="{{ member.id }}" 
+                            {% if member_filter == member.id %} selected {% endif %}
+                        >
+                            {{ member.first_name }} {{ member.last_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                <!-- Filter by Status -->
+                <select 
+                    id="filter_status" 
+                    name="status" 
+                    class="w-40 text-center block p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                    onchange="applyFilters()"
+                >
+                    <option value="all" {% if not status_filter or status_filter == "all" %} selected {% endif %}>ทุกสถานะ</option>
+                    <option value="todo" {% if status_filter == "todo" %} selected {% endif %}>กำลังทำ</option>
+                    <option value="in_progress" {% if status_filter == "in_progress" %} selected {% endif %}>ระหว่างดำเนินการ</option>
+                    <option value="done" {% if status_filter == "done" %} selected {% endif %}>เสร็จสิ้น</option>
+                </select>
+
                 </div>
             </div>
 
             <div class="mx-40 text-xl">
-                <div class="bg-slate-100 p-2 flex justify-between items-center rounded-lg drop-shadow-lg shadow-lg">
-                    <table class="table-auto w-full border-collapse">
-                        <thead class="bg-gray-100">
+                <div class="p-2 flex flex-col gap-6">
+                  {% for task in tasks %}
+                    <table class="px-8 bg-gray-100 table-auto w-full border-collapse rounded-lg drop-shadow-lg shadow-lg">
+                        <thead class="">
                             <tr class="text-left">
-                                <th class="px-4 py-2 w-1/4">ชื่องาน</th>
+                                <th class="px-8 py-2 w-1/4">ชื่องาน</th>
                                 <th class="px-4 py-2 w-1/6">วันที่เริ่มต้น</th>
                                 <th class="px-4 py-2 w-1/6">วันที่สิ้นสุด</th>
                                 <th class="px-4 py-2 w-1/4">ผู้รับผิดชอบ</th>
                                 <th class="px-4 py-2 w-1/6">สถานะ</th>
+                                <th class="px-4 py-2 w-1/6"></th>
+
                             </tr>
                         </thead>
                         <tbody>
-                            {% for task in tasks %}
                             <tr>
-                                <td class="px-4 py-2">{{ task.title }}</td>
+                                <td class="px-8 py-2">{{ task.title }}</td>
                                 <td class="px-4 py-2">{{ task.created_at|date:"d/m/Y" }}</td>
                                 <td class="px-4 py-2">{{ task.due_date|date:"d/m/Y" }}</td>
                                 <td class="px-4 py-2">{{ task.assigned_to }}</td>
                                 <td class="px-4 py-2">{{ task.get_status_display }}</td>
+                                <td class="">
+                                  <div class="relative -mt-10 mx-5">
+                                  <svg class="w-8 h-8 cursor-pointer" onclick="openWorkPopup{{ task.id }}(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                      <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
+                                  </svg>
+                                  <div id="editPopuptwo{{ task.id }}" class=" hidden absolute -top-8 -left-[10.5rem] right-0 w-40 ">
+                                      <div class="bg-white bg-opacity-90 backdrop-blur py-2 px-4 rounded-lg shadow-lg">
+                                          <div class="text-base">
+                                              <button onclick="openeditWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
+                                              <button onclick="opendeleteWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                            </td>
                             </tr>
                             {% empty %}
                             <tr>
                                 <td colspan="5" class="text-center py-4">ยังไม่มีงานในโครงการนี้</td>
                             </tr>
-                            {% endfor %}
                         </tbody>
-                    </table>
-                    
-                    
-                          
-                    <div class="relative">
-                        <svg class="w-8 h-8 cursor-pointer z-10" onclick="openWorkPopup(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
-                            <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
-                        </svg>
-                        <div id="editPopuptwo" class="hidden absolute top-3 -left-[10.5rem] right-0 z-0 w-40 ">
-                            <div class="bg-white bg-opacity-90 backdrop-blur py-2 px-4 rounded-lg shadow-lg">
-                                <div class="text-base">
-                                    <button onclick="openeditWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
-                                    <button onclick="opendeleteWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                        
+                    </table> 
+                    {% endfor %}
+ 
+                   
             </div>
+          </div>
         </div>
 
         <!-- แก้ไขโปรเจ็ค -->        
-        <div id="EditWork" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-            <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
+        <div id="EditWork" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+            <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto ">
                 <div class="flex justify-between">
-                    <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
+                    <h3 class="text-lg font-semibold">แก้ไขงาน</h3>
                     <!-- Close Button -->
                     <button onclick="closeeditWork()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
                 </div>
-                <form method="POST" enctype="multipart/form-data" class="space-y-6">
-                    {% csrf_token %}
-                    
-                    <!-- First Name -->
-                    <div class="flex flex-col">
-                        <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
-                        <div class="mt-1">
-                            <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        </div>
-                    
-                    </div>
-                
-                    <!-- Description -->
-                    <div class="flex flex-col">
-                        <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
-                        <div class="mt-1">
-                            <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
-                        </div>
-                    
-                    </div>
-                
-                    <!-- Members -->
-                    <div class="flex flex-col">
-                        <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
-                        <div class="mt-1">
-                            <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                                <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
-                                    <option value="{{ member.id }}">สูไลมาน จะระแอ</option> <!-- member.id คือค่า value และ member.name คือชื่อสมาชิก -->
-                            </select>
-                        </div>
-                    </div>
-                
-                <!-- Start Date -->
-                    <div class="flex flex-col">
-                        <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
-                        <div class="mt-1">
-                            <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        </div>
-                    </div>
+                <form
+                method="POST"
+                action="{% if task.id %}{% url 'edit_task' task.id %}{% else %}#{% endif %}"
+                enctype="multipart/form-data"
+                class="space-y-6"
+              >
+                {% csrf_token %}
 
-                    <!-- End Date -->
-                    <div class="flex flex-col">
-                        <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
-                        <div class="mt-1">
-                            <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        </div>
+                <!-- Title => Task.title -->
+                <div class="flex flex-col">
+                  <label for="title_{{ task.id }}" class="block text-sm font-medium text-black">ชื่องาน</label>
+                  <div class="mt-1">
+                    <input
+                      type="text"
+                      id="title_{{ task.id }}"
+                      name="title"
+                      value="{{ task.title }}"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <!-- Description => Task.description -->
+                <div class="flex flex-col">
+                  <label for="description_{{ task.id }}" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                  <div class="mt-1">
+                    <textarea
+                      id="description_{{ task.id }}"
+                      name="description"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      rows="2"
+                    >{{ task.description }}</textarea>
+                  </div>
+                </div>
+
+                <!-- Assigned To => Task.assigned_to -->
+                <div class="flex flex-col">
+                  <label for="assigned_to_{{ task.id }}" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                  <div class="mt-1">
+                    <select
+                      id="assigned_to_{{ task.id }}"
+                      name="assigned_to"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="" disabled selected>เลือกสมาชิก</option>
+                      {% for member in members %}
+                        <option
+                          value="{{ member.id }}"
+                          {% if member == task.assigned_to %} selected {% endif %}
+                        >
+                          {{ member.first_name }} {{ member.last_name }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                </div>
+
+                <!-- Due Date => Task.due_date -->
+                <div class="flex flex-col">
+                  <label for="due_date_{{ task.id }}" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                  <div class="mt-1">
+                    <input
+                      type="text"
+                      id="due_date_{{ task.id }}"
+                      name="due_date"
+                      placeholder="dd/mm/yyyy"
+                      value="{{ task.due_date|date:'d/m/Y' }}"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <!-- Status => Task.status -->
+                <div class="flex flex-col">
+                  <div>
+                    <label class="block text-sm font-medium text-black">สถานะ</label>
+                    <div class="mt-1 flex space-x-4">
+                      <button 
+                        type="button"
+                        id="in_progress_{{ task.id }}" 
+                        onclick="setTaskStatus('{{ task.id }}', 'in_progress')"
+                        class="status-btn px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 {% if task.status == 'in_progress' %}text-blue-600 bg-blue-100{% endif %}"
+                      >
+                        กำลังดำเนินการ
+                      </button>
+                      <button 
+                        type="button"
+                        id="done_{{ task.id }}" 
+                        onclick="setTaskStatus('{{ task.id }}', 'done')"
+                        class="status-btn px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 {% if task.status == 'done' %}text-blue-600 bg-blue-100{% endif %}"
+                      >
+                        เสร็จสิ้น
+                      </button>
                     </div>
-                    <div class="flex flex-col">
-                        <label class="block text-sm font-medium text-black">สถานะ</label>
-                        <div class="mt-1 flex space-x-4">
-                            <!-- กำลังทำงาน -->
-                            <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                กำลังทำงาน
-                            </span>
-                            
-                            <!-- ไม่ทำงาน -->
-                            <span id="not_working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
-                                ไม่ทำงาน
-                            </span>
-                        </div>
-                        <input type="hidden" id="is_active" name="is_active">
-                    </div>
-                    <!-- Submit Button -->
-                    <div class="flex justify-end">
-                        <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
-                            ยืนยันแก้ไขงาน
-                        </button>
-                    </div>
-                </form>
+                  </div>
+                  <!-- Hidden input to store status -->
+                  <input
+                    type="hidden"
+                    id="task_status_{{ task.id }}"
+                    name="status"
+                    value="{{ task.status }}"
+                  />
+                </div>
+
+                <!-- Attachment => Task.attachment -->
+                <div class="flex flex-col">
+                  <label for="attachment_{{ task.id }}" class="block text-sm font-medium text-black">ไฟล์แนบ</label>
+                  <div class="mt-1">
+                    <input
+                      type="file"
+                      id="attachment_{{ task.id }}"
+                      name="attachment"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="flex justify-end">
+                  <button
+                    type="submit"
+                    class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out"
+                  >
+                    ยืนยันการแก้ไขงาน
+                  </button>
+                </div>
+              </form>
+
             </div>
         </div>
             <!-- ลบโปรเจ็ค -->
@@ -723,8 +918,34 @@
     });
 </script>
 
+<script>
+  // Initialize Flatpickr for start dates dynamically
+  document.addEventListener('DOMContentLoaded', function() {
+      // Loop through all start date inputs based on project ID
+      {% for project in projects %}
+      flatpickr("#start_date_{{ project.id }}", {
+          dateFormat: "d/m/Y", // Match the desired format
+          defaultDate: "{{ project.start_date|date:'d/m/Y' }}" // Prefill the current start date
+      });
+      {% endfor %}
+  });
+</script>
+
+<script>
+  // Initialize Flatpickr for start dates dynamically
+  document.addEventListener('DOMContentLoaded', function() {
+      // Loop through all start date inputs based on project ID
+      {% for project in projects %}
+      flatpickr("#end_date_{{ project.id }}", {
+          dateFormat: "d/m/Y", // Match the desired format
+          defaultDate: "{{ project.end_date|date:'d/m/Y' }}" // Prefill the current start date
+      });
+      {% endfor %}
+  });
+</script>
  <!-- Move the script to the bottom of the body -->
   
+ 
   <!-- เพิ่มโปรเจ็ค -->
 
   <!-- 3) Initialize Tom Select -->
@@ -786,8 +1007,9 @@
 <!-- เปิดปุ่มจัดการแก้ไขโปรเจ็ค -->
 <script>
     // Function to open/close the "แก้ไข" and "ลบงาน" popup
-    function openEditDeletePopup(event) {
-        const popup = document.getElementById('editDeletePopup');
+    {% for project in projects %}
+    function openEditDeletePopup{{project.id}}(event) {
+        const popup = document.getElementById('editDeletePopup{{project.id}}');
         
         // Toggle the 'hidden' class to show/hide the popup
         popup.classList.toggle('hidden');
@@ -795,41 +1017,70 @@
         // Optionally, store the related project or item ID if needed
         // event.target.closest('.project-item').id; // for example
     }
-    
     // Function for "แก้ไข" button (add functionality as needed)
-    function openeditProject() {
-        document.getElementById('Editproject').classList.remove('hidden');
-        document.getElementById('editDeletePopup').classList.add('hidden');
+    function openeditProject{{project.id}}() {
+        document.getElementById('Editproject{{project.id}}').classList.remove('hidden');
+        document.getElementById('editDeletePopup{{project.id}}').classList.add('hidden');
 
     }
 
-    function closeeditProject() {
-        document.getElementById('Editproject').classList.add('hidden');
+    function closeeditProject{{project.id}}() {
+        document.getElementById('Editproject{{project.id}}').classList.add('hidden');
 
     }
 
     // Function for "ลบงาน" button (add functionality as needed)
-    function opendeleteProject() {
-        document.getElementById('deleteProject').classList.remove('hidden');
-        document.getElementById('editDeletePopup').classList.add('hidden');
+    function opendeleteProject{{project.id}}() {
+        document.getElementById('deleteProject{{project.id}}').classList.remove('hidden');
+        document.getElementById('editDeletePopup{{project.id}}').classList.add('hidden');
 
     }
-    function closedeleteProject() {
-        document.getElementById('deleteProject').classList.add('hidden');
+    function closedeleteProject(projectId) {
+        document.getElementById(`deleteProject${projectId}`).classList.add('hidden');
     }
     
     // Function to close the popup manually (optional)
-    function closeEditDeletePopup() {
+    function closeEditDeletePopup{{project.id}}() {
         const popup = document.getElementById('editDeletePopup');
         popup.classList.add('hidden');
     }
-    </script>
+    {% endfor %}
 
+    </script>
+    
+    <script>
+      function applyFilters() {
+          const member = document.getElementById('filter_member').value;
+          const status = document.getElementById('filter_status').value;
+          
+          const queryParams = new URLSearchParams(window.location.search);
+  
+          // Handle Member Filter
+          if (member === "all") {
+              queryParams.delete('member'); // Remove the member filter if "all" is selected
+          } else if (member) {
+              queryParams.set('member', member); // Apply the selected member
+          }
+  
+          // Handle Status Filter
+          if (status === "all") {
+              queryParams.delete('status'); // Remove the status filter if "all" is selected
+          } else if (status) {
+              queryParams.set('status', status); // Apply the selected status
+          }
+  
+          // Update the URL with the new query parameters
+          window.location.search = queryParams.toString();
+      }
+  </script>
+  
     <!-- แก้ไขงาน -->
 <script>
     // Function to open/close the "แก้ไข" and "ลบงาน" popup
-    function openWorkPopup(event) {
-        const popup = document.getElementById('editPopuptwo');
+    {% for task in tasks %}
+
+    function openWorkPopup{{ task.id }}(event) {
+        const popup = document.getElementById('editPopuptwo{{ task.id }}');
         
         // Toggle the 'hidden' class to show/hide the popup
         popup.classList.toggle('hidden');
@@ -837,6 +1088,7 @@
         // Optionally, store the related project or item ID if needed
         // event.target.closest('.project-item').id; // for example
     }
+    {% endfor %}
     
     // Function for "แก้ไข" button (add functionality as needed)
     function openeditWork() {
@@ -861,36 +1113,70 @@
 
     </script>
 
+  <script>
+    document.querySelectorAll('.status-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active state from all buttons
+            document.querySelectorAll('.status-btn').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'bg-blue-100');
+            });
+            
+            // Add blue text and light blue background to clicked button
+            this.classList.add('text-blue-600', 'bg-blue-100');
+            
+            // Update hidden input value
+            document.getElementById('task_status').value = this.dataset.status;
+            
+            console.log('Selected status:', this.dataset.status);
+        });
+    });
+  </script>
 
     <script>
-        // การกำหนดค่าให้เลือก
-        const workingOption = document.getElementById('working');
-        const notWorkingOption = document.getElementById('not_working');
-        const hiddenInput = document.getElementById('is_active');
+      function setStatus(projectId, isActive) {
+          // Get the hidden input for the status
+          const statusInput = document.getElementById(`is_active_${projectId}`);
 
-        // ฟังก์ชันเปลี่ยนสถานะเมื่อเลือกตัวใดตัวหนึ่ง
-        function selectOption(selected) {
-            if (selected === 'working') {
-                workingOption.classList.add('bg-blue-500', 'text-white');
-                notWorkingOption.classList.remove('bg-blue-500', 'text-white');
-                hiddenInput.value = 'working'; // กำหนดค่าให้ hidden input
-            } else if (selected === 'not_working') {
-                notWorkingOption.classList.add('bg-blue-500', 'text-white');
-                workingOption.classList.remove('bg-blue-500', 'text-white');
-                hiddenInput.value = 'not_working'; // กำหนดค่าให้ hidden input
-            }
-        }
+          // Update the hidden input's value
+          statusInput.value = isActive ? 'true' : 'false';
 
-        // การคลิกที่ "กำลังทำงาน"
-        workingOption.addEventListener('click', function() {
-            selectOption('working');
-        });
+          // Update the styles of the buttons
+          const workingButton = document.getElementById(`working_${projectId}`);
+          const notWorkingButton = document.getElementById(`not_working_${projectId}`);
 
-        // การคลิกที่ "ไม่ทำงาน"
-        notWorkingOption.addEventListener('click', function() {
-            selectOption('not_working');
-        });
+          if (isActive) {
+              // If "กำลังทำงาน" is selected
+              workingButton.classList.add('text-blue-600', 'bg-blue-100');
+              notWorkingButton.classList.remove('text-blue-600', 'bg-blue-100');
+          } else {
+              // If "ไม่ทำงาน" is selected
+              notWorkingButton.classList.add('text-blue-600', 'bg-blue-100');
+              workingButton.classList.remove('text-blue-600', 'bg-blue-100');
+          }
+      }
     </script>
+
+    <script>
+      function setAddProjectStatus(isActive) {
+        // Update the hidden input value
+        const statusInput = document.getElementById('is_active');
+        statusInput.value = isActive ? 'true' : 'false';
+
+        // Update the button styles
+        const workingButton = document.getElementById('working');
+        const notWorkingButton = document.getElementById('not_working');
+
+        if (isActive) {
+          workingButton.classList.add('text-blue-600', 'bg-blue-100');
+          notWorkingButton.classList.remove('text-blue-600', 'bg-blue-100');
+        } else {
+          notWorkingButton.classList.add('text-blue-600', 'bg-blue-100');
+          workingButton.classList.remove('text-blue-600', 'bg-blue-100');
+        }
+      }
+    </script>
+
+
     {% endblock %}
 
 

@@ -123,7 +123,98 @@ def add_project(request):
 
     # If GET, show the form (or the page containing the modal) with a list of possible members
     return redirect('project_list')
-   
+
+def edit_project(request, project_id):
+    # Get the project to edit
+    project = get_object_or_404(Project, pk=project_id)
+    print("Project:", project)
+    # Get all possible members (users)
+    if request.method == 'POST':
+        # 1) Gather the posted form data
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        
+        member_ids = request.POST.getlist('edit_members')  # Extract member IDs from the form
+        print("Member IDs from Form:", member_ids)  # Debugging
+
+        
+        start_date_str = request.POST.get('start_date')
+        end_date_str = request.POST.get('end_date')
+        
+        # Convert date strings (dd/mm/yyyy) to Python datetime
+        date_format = "%d/%m/%Y"
+        start_date = None
+        end_date = None
+        
+        if start_date_str:
+            try:
+                start_date = datetime.strptime(start_date_str, date_format)
+            except ValueError:
+                start_date = None
+        
+        if end_date_str:
+            try:
+                end_date = datetime.strptime(end_date_str, date_format)
+            except ValueError:
+                end_date = None
+
+        # is_active from hidden input (default to True if not found)
+        is_active_str = request.POST.get('is_active', 'true')
+        is_active = (is_active_str.lower() == 'true')
+        
+        # 2) Update the project fields
+        project.name = name
+        project.description = description
+        project.start_date = start_date
+        project.end_date = end_date
+        project.is_active = is_active
+        project.save()
+        
+        # 3) Update members
+        # Clear existing members
+        # Update project members
+        project.members.clear()  # Clear existing members
+        print("Members after clearing:", project.members.all())  # Debugging
+        
+        for mid in member_ids:
+            try:
+                user_member = User.objects.get(pk=int(mid))  # Convert ID to int
+                print(f"Adding User ID {mid} ({user_member}) to Project")  # Debugging
+                project.members.add(user_member)
+            except User.DoesNotExist:
+                print(f"User ID {mid} does not exist")  # Handle invalid user IDs
+        
+                print("Members after saving:", project.members.all())  # Debugging
+                pass  # Handle or ignore invalid user IDs
+        
+        # 4) Redirect (or show success message) after updating
+        return redirect('project_list')  # Change to your desired URL name
+
+    # If GET, return to project list or show the form with pre-filled data
+    return redirect('project_list')  # Change to your desired URL name
+
+def delete_project(request, project_id):
+    # Ensure the request is a POST request
+    if request.method == 'POST':
+        # Get the project to delete
+        project = get_object_or_404(Project, pk=project_id)
+
+        # Save the project name for the confirmation message
+        project_name = project.name
+
+        # Delete the project
+        project.delete()
+
+        # Add a success message
+        messages.success(request, f"The project '{project_name}' was successfully deleted.")
+
+        # Redirect to the project list or another appropriate page
+        return redirect('project_list')  # Replace with the name of your project list view
+
+    # If not a POST request, redirect back to the project list
+    return redirect('project_list')  # Replace with the appropriate redirect
+
+
 def project_list(request):
     """
     Show all projects with task completion statistics.
@@ -142,31 +233,56 @@ def project_list(request):
 
     members = User.objects.all()
 
-    return render(request, 'tasks/project_lists.html', {
-        'projects': projects,
-        'members': members
-    })
-
-def project_detail(request, pk):
-    projects = Project.objects.all()
-    project = get_object_or_404(Project, pk=pk)
-    tasks = project.tasks.all()
-    members = project.members.all()
-    
-    # Calculate completion percentage
-    total_tasks = tasks.count()
-    completed_tasks = tasks.filter(status='done').count()  # Assuming 'done' is the status for completed
-    completion_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
-    project.completion_percentage = round(completion_percentage, 2)
+    project_members = {
+        project.id: list(project.members.values_list('id', flat=True))
+        for project in projects
+    }
 
     return render(request, 'tasks/project_lists.html', {
         'projects': projects,
         'members': members,
-        'tasks': tasks,
-        'selected_project': project
+        'project_members': project_members,  # Pass project member data
     })
 
+def project_detail(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    tasks = project.tasks.all()
+    members = project.members.all()
 
+    # Get filters from request
+    member_filter = request.GET.get('member')
+    status_filter = request.GET.get('status')
+
+    # Convert member_filter to an integer (if it's not "all" or None)
+    if member_filter and member_filter != "all":
+        try:
+            member_filter = int(member_filter)
+        except ValueError:
+            member_filter = None
+
+    # Debugging
+    print(f"Member Filter (after conversion): {member_filter}")
+
+    # Apply filters
+    if member_filter:
+        tasks = tasks.filter(assigned_to_id=member_filter)
+    if status_filter and status_filter != "all":
+        tasks = tasks.filter(status=status_filter)
+
+    # Calculate completion percentage
+    total_tasks = tasks.count()
+    completed_tasks = tasks.filter(status='done').count()
+    completion_percentage = (completed_tasks / total_tasks * 100) if total_tasks > 0 else 0
+    project.completion_percentage = round(completion_percentage, 2)
+
+    return render(request, 'tasks/project_lists.html', {
+        'projects': Project.objects.all(),
+        'members': members,
+        'tasks': tasks,
+        'selected_project': project,
+        'member_filter': member_filter,
+        'status_filter': status_filter,
+    })
 
 def add_task(request, pk):
     """
@@ -212,6 +328,30 @@ def add_task(request, pk):
 
     # For non-POST requests, redirect back to the project detail page
     return redirect('project_detail', pk=pk)
+
+def edit_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+
+    if request.method == 'POST':
+        # Get form data
+        task.title = request.POST.get('title')
+        task.description = request.POST.get('description')
+        task.due_date = request.POST.get('due_date')  # Convert to proper date format if necessary
+        task.status = request.POST.get('status')
+
+        # Assign the member
+        assigned_to_id = request.POST.get('assigned_to')
+        if assigned_to_id:
+            task.assigned_to_id = assigned_to_id
+
+        # Save the task
+        task.save()
+
+        # Redirect to the task list or project detail
+        return redirect('project_detail', pk=task.project_id)
+
+    # Redirect back to the project detail if not a POST request
+    return redirect('project_detail', pk=task.project_id)
 
 def add_tasks(request, project_id):
     """
