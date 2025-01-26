@@ -9,7 +9,7 @@ from django.contrib.auth import authenticate, login, logout
 from .cosumers import NotificationConsumer
 from django.utils.timezone import now
 from django.template.loader import render_to_string
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
 
 def user_login(request):
@@ -336,13 +336,28 @@ def edit_task(request, task_id):
         # Get form data
         task.title = request.POST.get('title')
         task.description = request.POST.get('description')
-        task.due_date = request.POST.get('due_date')  # Convert to proper date format if necessary
+
+        # Convert the due_date from dd/mm/yyyy to yyyy-mm-dd
+        due_date_str = request.POST.get('due_date')  # Input from form
+        if due_date_str:
+            try:
+                # Convert to datetime object
+                due_date = datetime.strptime(due_date_str, "%d/%m/%Y").date()
+                task.due_date = due_date
+            except ValueError:
+                return HttpResponse("Invalid date format. Please use DD/MM/YYYY.", status=400)
+
+        # Update the status
         task.status = request.POST.get('status')
 
         # Assign the member
         assigned_to_id = request.POST.get('assigned_to')
         if assigned_to_id:
             task.assigned_to_id = assigned_to_id
+        
+        # Handle file attachment
+        if 'attachment' in request.FILES:
+            task.attachment = request.FILES['attachment']
 
         # Save the task
         task.save()
@@ -351,6 +366,18 @@ def edit_task(request, task_id):
         return redirect('project_detail', pk=task.project_id)
 
     # Redirect back to the project detail if not a POST request
+    return redirect('project_detail', pk=task.project_id)
+
+def delete_task(request, task_id):
+    task = get_object_or_404(Task, pk=task_id)
+
+    if request.method == 'POST':
+        # Delete the task
+        task.delete()
+        # Redirect to the project detail page or task list
+        return redirect('project_detail', pk=task.project_id)
+
+    # Redirect if not a POST request
     return redirect('project_detail', pk=task.project_id)
 
 def add_tasks(request, project_id):

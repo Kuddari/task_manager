@@ -711,8 +711,14 @@
                                   <div id="editPopuptwo{{ task.id }}" class=" hidden absolute -top-8 -left-[10.5rem] right-0 w-40 ">
                                       <div class="bg-white bg-opacity-90 backdrop-blur py-2 px-4 rounded-lg shadow-lg">
                                           <div class="text-base">
-                                              <button onclick="openeditWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2">แก้ไข</button>
-                                              <button onclick="opendeleteWork()" class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
+                                            <button 
+                                            onclick="openeditWork('{{ task.id }}')" 
+                                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full mb-2"
+                                          >
+                                            แก้ไข
+                                          </button>
+                                          
+                                              <button onclick="opendeleteWork('{{ task.id }}')"  class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">ลบงาน</button>
                                           </div>
                                       </div>
                                   </div>
@@ -733,13 +739,14 @@
           </div>
         </div>
 
-        <!-- แก้ไขโปรเจ็ค -->        
-        <div id="EditWork" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+        <!-- แก้ไขงาน -->     
+        {% for task in tasks %}   
+        <div  id="EditWork-{{ task.id }}" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
             <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto ">
                 <div class="flex justify-between">
                     <h3 class="text-lg font-semibold">แก้ไขงาน</h3>
                     <!-- Close Button -->
-                    <button onclick="closeeditWork()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
+                    <button onclick="closeeditWork('{{ task.id }}')"  class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">X</button>
                 </div>
                 <form
                 method="POST"
@@ -748,7 +755,7 @@
                 class="space-y-6"
               >
                 {% csrf_token %}
-
+                
                 <!-- Title => Task.title -->
                 <div class="flex flex-col">
                   <label for="title_{{ task.id }}" class="block text-sm font-medium text-black">ชื่องาน</label>
@@ -803,20 +810,22 @@
                 </div>
 
                 <!-- Due Date => Task.due_date -->
-                <div class="flex flex-col">
-                  <label for="due_date_{{ task.id }}" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
-                  <div class="mt-1">
-                    <input
-                      type="text"
-                      id="due_date_{{ task.id }}"
-                      name="due_date"
-                      placeholder="dd/mm/yyyy"
-                      value="{{ task.due_date|date:'d/m/Y' }}"
-                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
-                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+          
+                  <div class="flex flex-col">
+                    <label for="due_date_{{ task.id }}" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                    <div class="mt-1">
+                      <input
+                        type="text"
+                        id="due_date_{{ task.id }}"
+                        name="due_date"
+                        placeholder="dd/mm/yyyy"
+                        value="{{ task.due_date|date:'d/m/Y' }}"
+                        class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
+                              focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      />
+                    </div>
                   </div>
-                </div>
+
 
                 <!-- Status => Task.status -->
                 <div class="flex flex-col">
@@ -848,21 +857,40 @@
                     name="status"
                     value="{{ task.status }}"
                   />
+
                 </div>
 
-                <!-- Attachment => Task.attachment -->
                 <div class="flex flex-col">
                   <label for="attachment_{{ task.id }}" class="block text-sm font-medium text-black">ไฟล์แนบ</label>
                   <div class="mt-1">
+                    {% if task.attachment %}
+                      <!-- Show a download link for the current file -->
+                      <p>
+                        Current File: 
+                        <a 
+                          href="{{ task.attachment.url }}" 
+                          target="_blank" 
+                          download 
+                          class="text-blue-500 hover:underline"
+                        >
+                          {{ task.attachment.name }}
+                        </a>
+                      </p>
+                    {% else %}
+                      <p class="text-gray-500">No file attached</p>
+                    {% endif %}
+                
+                    <!-- File input for uploading a new file -->
                     <input
                       type="file"
                       id="attachment_{{ task.id }}"
                       name="attachment"
-                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
-                            focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
                 </div>
+                
+                
 
                 <!-- Submit Button -->
                 <div class="flex justify-end">
@@ -877,24 +905,29 @@
 
             </div>
         </div>
+        
             <!-- ลบโปรเจ็ค -->
-        <div id="deleteWork" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+        <div id="deleteWork-{{ task.id }}" 
+        class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
             <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80 ">
                 <div class="text-center">
                     <h3 class="text-lg">ยืนยันที่จะลบโครงการ</h3>
                 </div>
-                <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form method="POST" 
+                action="{% url 'delete_task' task.id %}" 
+                enctype="multipart/form-data" class="space-y-6">
                     {% csrf_token %}
                     <div class="flex justify-center gap-4">
                         <button type="submit" class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg">
                             ยืนยัน
                         </button>
-                        <button type="button" onclick="closedeleteWork()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">ยกเลิก</button>
+                        <button type="button" onclick="closedeleteWork('{{ task.id }}')"  class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">ยกเลิก</button>
 
                     </div>
                 </form>
             </div>
         </div>
+        {% endfor %}
      </div>
  </div>
  
@@ -916,6 +949,18 @@
             dateFormat: "d/m/Y", // ใช้รูปแบบ dd/mm/yyyy
         });
     });
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+      // Select all inputs with IDs starting with "due_date_"
+      document.querySelectorAll("[id^='due_date_']").forEach(input => {
+          flatpickr(input, {
+              locale: "th", // Use Thai locale for the calendar
+              dateFormat: "d/m/Y", // Format dates as dd/mm/yyyy
+          });
+      });
+  });
 </script>
 
 <script>
@@ -1091,25 +1136,45 @@
     {% endfor %}
     
     // Function for "แก้ไข" button (add functionality as needed)
-    function openeditWork() {
-        document.getElementById('EditWork').classList.remove('hidden');
-        document.getElementById('editPopuptwo').classList.add('hidden');
-
+    function openeditWork(taskId) {
+    // Show the specific edit modal
+    const modal = document.getElementById(`EditWork-${taskId}`);
+    if (modal) {
+        modal.classList.remove('hidden');
+    } else {
+        console.error(`Modal for Task ID ${taskId} not found.`);
     }
+}
 
-    function closeeditWork() {
-        document.getElementById('EditWork').classList.add('hidden');
+function closeeditWork(taskId) {
+    const modal = document.getElementById(`EditWork-${taskId}`);
+    if (modal) {
+        modal.classList.add('hidden'); // Hide the modal
+    } else {
+        console.error(`Modal for Task ID ${taskId} not found.`);
     }
+}
 
-    // Function for "ลบงาน" button (add functionality as needed)
-    function opendeleteWork() {
-        document.getElementById('deleteWork').classList.remove('hidden');
-        document.getElementById('editPopuptwo').classList.add('hidden');
+function opendeleteWork(taskId) {
+    // Show the modal for the specified task
+    const modal = document.getElementById(`deleteWork-${taskId}`);
+    if (modal) {
+        modal.classList.remove('hidden'); // Show the modal
+    } else {
+        console.error(`Delete modal for Task ID ${taskId} not found.`);
+    }
+}
 
+function closedeleteWork(taskId) {
+    // Hide the modal for the specified task
+    const modal = document.getElementById(`deleteWork-${taskId}`);
+    if (modal) {
+        modal.classList.add('hidden'); // Hide the modal
+    } else {
+        console.error(`Delete modal for Task ID ${taskId} not found.`);
     }
-    function closedeleteWork() {
-        document.getElementById('deleteWork').classList.add('hidden');
-    }
+}
+
 
     </script>
 
@@ -1154,7 +1219,34 @@
               workingButton.classList.remove('text-blue-600', 'bg-blue-100');
           }
       }
+
+
+      function setTaskStatus(taskId, status) {
+          // Get the hidden input for the task's status
+          const statusInput = document.getElementById(`task_status_${taskId}`);
+          if (statusInput) {
+              // Update the value of the hidden input
+              statusInput.value = status;
+
+              // Update the button styles dynamically
+              const inProgressBtn = document.getElementById(`in_progress_${taskId}`);
+              const doneBtn = document.getElementById(`done_${taskId}`);
+
+              if (status === 'in_progress') {
+                  inProgressBtn.classList.add('text-blue-600', 'bg-blue-100');
+                  doneBtn.classList.remove('text-blue-600', 'bg-blue-100');
+              } else if (status === 'done') {
+                  doneBtn.classList.add('text-blue-600', 'bg-blue-100');
+                  inProgressBtn.classList.remove('text-blue-600', 'bg-blue-100');
+              }
+          } else {
+              console.error(`Hidden status input for Task ID ${taskId} not found.`);
+          }
+      }
+
     </script>
+
+    
 
     <script>
       function setAddProjectStatus(isActive) {

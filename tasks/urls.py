@@ -21,6 +21,7 @@ urlpatterns = [
     path('projects/<int:pk>/', project_detail, name='project_detail'),
     path('tasks/create/', create_task, name='create_task'),
     path('edit_task/<int:task_id>/', edit_task, name='edit_task'),
+    path('delete_task/<int:task_id>/', delete_task, name='delete_task'),
     path('notifications/', notifications, name='notifications'),
     path('create_user/', create_user, name='create_user'),
     path('notifications/<int:pk>/read/', mark_notification_as_read, name='mark_notification_as_read'),
