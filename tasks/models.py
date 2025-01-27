@@ -99,8 +99,11 @@ class Task(models.Model):
     is_overdue = models.BooleanField(default=False)
     attachment = models.FileField(upload_to='task_attachments/', null=True, blank=True)
 
-    # NEW FIELD: Tracks the last time the status was updated
     status_updated_at = models.DateTimeField(null=True, blank=True)
+    # New Fields
+    url = models.URLField(max_length=500, null=True, blank=True)  # URL field
+    details = models.TextField(null=True, blank=True)  # รายละเอียด field
+    is_checked = models.BooleanField(default=False)  # Boolean field to track if the task is reviewed or confirmed
 
     def __str__(self):
         return self.title

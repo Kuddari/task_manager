@@ -6,11 +6,13 @@ from .forms import *
 from .utils import create_notification
 from datetime import datetime
 from django.contrib.auth import authenticate, login, logout
+from django.core.files.storage import default_storage
 from .cosumers import NotificationConsumer
 from django.utils.timezone import now
 from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
+import json
 
 def user_login(request):
     if request.method == 'POST':
@@ -494,32 +496,99 @@ def employee_list(request):
     # Pass the user list to the template
     return render(request, 'tasks/employee.html', {'employees': employees})
 
-from django.shortcuts import render
-from .models import Task
-
 def tasks_list(request):
     tasks = Task.objects.all()
+    overdue_filter = request.GET.get('overdue')  # Get the 'overdue' query parameter
+    status_filter = None  # Initialize status_filter to None
+    is_checked_filter = request.GET.get('is_checked')  # Get the 'is_checked' query parameter
 
-    # Filter by status if 'status' is in the query parameters
-    status_filter = request.GET.get('status', 'to_do')
-    if status_filter:
-        tasks = tasks.filter(status=status_filter)
-
+    if overdue_filter == 'true':  # If 'overdue=true' is specified
+        tasks = tasks.filter(is_overdue=True, assigned_to=request.user)  # Filter only overdue tasks
+    elif is_checked_filter == 'false':  # Filter for 'to_check' tasks (is_checked=False and status='done')
+        tasks = tasks.filter(is_checked=False, status='done', created_by=request.user)
+    else:
+        # Apply the status filter only when 'overdue' or 'is_checked' is not active
+        status_filter = request.GET.get('status', 'to_do')  # Default to 'to_do'
+        if status_filter:
+            tasks = tasks.filter(status=status_filter, assigned_to=request.user)  # Filter by status
+    
     # Calculate counts for each task status
     counts = {
-        'in_progress': Task.objects.filter(status='in_progress').count(),
-        'done': Task.objects.filter(status='done').count(),
-        'overdue': Task.objects.filter(status='overdue').count(),
-        'to_check': Task.objects.filter(status='to_check').count(),
+        'in_progress': Task.objects.filter(status='in_progress', assigned_to=request.user).count(),
+        'done': Task.objects.filter(status='done', assigned_to=request.user).count(),
+        'overdue': Task.objects.filter(is_overdue=True, assigned_to=request.user).count(),  # Count overdue tasks
+        'to_check': Task.objects.filter(status='done', is_checked=False, created_by=request.user).count(),  # Count tasks to check
     }
 
     return render(request, 'tasks/project_list.html', {
         'tasks': tasks,
         'status_filter': status_filter,
+        'overdue_filter': overdue_filter,
+        'is_checked_filter': is_checked_filter,
         'counts': counts,
     })
 
+def update_task_status(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            status = data.get('status')
 
+            task = Task.objects.get(id=task_id)
+            task.status = status
+            task.save()
+
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def submit_task(request):
+    if request.method == 'POST':
+        try:
+            task_id = request.POST.get('task_id')
+            url_input = request.POST.get('urlInput')
+            details_input = request.POST.get('detailsInput')
+            file_upload = request.FILES.get('fileUpload')
+
+            # Fetch the task
+            task = Task.objects.get(id=task_id)
+
+            # Update the task fields
+            task.status = 'done'
+            task.url = url_input
+            task.details = details_input
+
+            # Handle file upload
+            if file_upload:
+                file_path = default_storage.save(f'uploads/{file_upload.name}', file_upload)
+                task.attachment = file_path  # Update the attachment field
+
+            task.save()
+
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+def get_task_details(request, task_id):
+    try:
+        task = Task.objects.get(id=task_id)
+        data = {
+            'file_url': task.attachment.url if task.attachment else None,
+            'url': task.url,
+            'details': task.details,
+        }
+        return JsonResponse(data)
+    except Task.DoesNotExist:
+        return JsonResponse({'error': 'Task not found'}, status=404)
+    
 def register_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')
