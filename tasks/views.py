@@ -494,6 +494,32 @@ def employee_list(request):
     # Pass the user list to the template
     return render(request, 'tasks/employee.html', {'employees': employees})
 
+from django.shortcuts import render
+from .models import Task
+
+def tasks_list(request):
+    tasks = Task.objects.all()
+
+    # Filter by status if 'status' is in the query parameters
+    status_filter = request.GET.get('status', 'to_do')
+    if status_filter:
+        tasks = tasks.filter(status=status_filter)
+
+    # Calculate counts for each task status
+    counts = {
+        'in_progress': Task.objects.filter(status='in_progress').count(),
+        'done': Task.objects.filter(status='done').count(),
+        'overdue': Task.objects.filter(status='overdue').count(),
+        'to_check': Task.objects.filter(status='to_check').count(),
+    }
+
+    return render(request, 'tasks/project_list.html', {
+        'tasks': tasks,
+        'status_filter': status_filter,
+        'counts': counts,
+    })
+
+
 def register_view(request):
     if request.method == 'POST':
         username = request.POST.get('username')

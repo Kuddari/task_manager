@@ -10,7 +10,17 @@
     {% block title %}
         My Project
     {% endblock %}
-   
+    <style>
+        /* Hide scrollbar while keeping scrolling functionality */
+        .scrollbar-hide {
+          -ms-overflow-style: none; /* IE and Edge */
+          scrollbar-width: none; /* Firefox */
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, and Opera */
+        }
+    </style>
+        
 </head>
 <body>
     {% block content %}
@@ -24,23 +34,101 @@
                     เพิ่มงาน
                 </button>
             </div>
-            <!-- Display list of projects -->
-            {% for project in projects %}
-            <div class="mt-20 border-2 border-black">
-                <div class=" bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg"></div>
-                    <h2>{{ project.name }}</h2>
-                </div>
-                <a href="{% url 'project_detail' project.id %}">View Details</a>
-                {% empty %}
-                <div class="mt-52 relative shadow-md rounded-lg text-center">
-                    <div class=" bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg">
-                      <h1 class="text-xl">ไม่มีงาน</h1>
+
+            <!-- Display list of tasks -->
+            <style>
+                /* Hide scrollbar while keeping scrolling functionality */
+                .scrollbar-hide {
+                  -ms-overflow-style: none; /* IE and Edge */
+                  scrollbar-width: none; /* Firefox */
+                }
+                .scrollbar-hide::-webkit-scrollbar {
+                  display: none; /* Chrome, Safari, and Opera */
+                }
+            </style>
+
+            <div class="container mt-19 mx-auto px-4">
+                <!-- Scrollable Container for Tasks -->
+                <div class="max-h-[580px] overflow-y-auto p-4 scrollbar-hide">
+                    <div class="flex flex-col gap-4">
+                        {% for task in tasks %}
+                        <!-- Task Item -->
+                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md">
+                            <!-- Task Details -->
+                            <div class="flex flex-col">
+                                <span class="text-sm font-medium text-gray-500">Task</span>
+                                <span class="text-lg font-semibold">{{ task.title }}</span>
+                            </div>
+            
+                            <!-- Due Date -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-medium text-gray-500">Due Date</span>
+                                <span class="text-md font-semibold">
+                                    {{ task.due_date|date:"d/m/Y"|default:"No Due Date" }}
+                                </span>
+                            </div>
+            
+                            <!-- Task Priority -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-medium text-gray-500">Priority</span>
+                                <span class="text-md font-semibold">
+                                    {% if task.priority == 'High' %}
+                                    <span class="text-red-500">High</span>
+                                    {% elif task.priority == 'Medium' %}
+                                    <span class="text-yellow-500">Medium</span>
+                                    {% else %}
+                                    <span class="text-green-500">Low</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+            
+                            <!-- Task Status -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-sm font-medium text-gray-500">Status</span>
+                                <div class="flex space-x-2 mt-1">
+                                    <!-- To Do -->
+                                    {% if task.status == 'to_do' %}
+                                    <button 
+                                        type="button" 
+                                        class="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-gray-300 transition"
+                                    >
+                                        To Do
+                                    </button>
+                                    {% elif task.status == 'in_progress' %}
+                                    <!-- In Progress -->
+                                    <button 
+                                        type="button" 
+                                        class="bg-blue-200 text-blue-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-blue-300 transition"
+                                    >
+                                        In Progress
+                                    </button>
+                                    {% else %}
+                                    <!-- Done -->
+                                    <button 
+                                        type="button" 
+                                        class="bg-green-200 text-green-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-green-300 transition"
+                                    >
+                                        Done
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                        </div>
+                        {% empty %}
+                        <!-- Placeholder for No Tasks -->
+                        <div class="text-center bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg shadow-md">
+                            <h2 class="text-lg font-semibold">ไม่มีงาน</h2>
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
-                
- 
-                {% endfor %}        
             </div>
+            
+        </div> 
+            
+           
+
           
    
            <!-- Create New Project Form - Popup Modal -->
@@ -125,25 +213,62 @@
         </div>
         <div class="flex flex-col col-span-2 justify-center w-1/2 bg-gradient-to-b from-blue-300 to-blue-100">
             <div class="mx-10 flex justify-center gap-12">
-                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px]" data-target="67">0</h1>
+                <!-- In Progress -->
+                <div 
+                    onclick="applyFilter('in_progress')" 
+                    class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl cursor-pointer hover:scale-105 transition-transform duration-300"
+                >
+                    <h1 class="text-center text-[36px] {% if status_filter == 'in_progress' %} text-blue-500 {% endif %}">
+                        กำลังทำ
+                    </h1>
+                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px] {% if status_filter == 'in_progress' %} text-blue-500 {% endif %}">
+                        {{ counts.in_progress }}
+                    </h1>
                 </div>
-                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px]" data-target="47">0</h1>
+            
+                <!-- Done -->
+                <div 
+                    onclick="applyFilter('done')" 
+                    class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl cursor-pointer hover:scale-105 transition-transform duration-300"
+                >
+                    <h1 class="text-center text-[36px] {% if status_filter == 'done' %} text-blue-500 {% endif %}">
+                        เสร็จสิ้น
+                    </h1>
+                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px] {% if status_filter == 'done' %} text-blue-500 {% endif %}">
+                        {{ counts.done }}
+                    </h1>
                 </div>
             </div>
+            
             <div class="mx-10 flex justify-center gap-12 mt-16">
-                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px]" data-target="45">0</h1>
+                <!-- Overdue -->
+                <div 
+                    onclick="applyFilter('overdue')" 
+                    class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-56 h-52 2xl:w-64 2xl:h-60 py-3 text-white rounded-3xl cursor-pointer hover:scale-105 transition-transform duration-300"
+                >
+                    <h1 class="text-center text-[36px] {% if status_filter == 'overdue' %} text-blue-500 {% endif %}">
+                        เลยกำหนด
+                    </h1>
+                    <h1 class="text-center 2xl:mt-12 mt-8 text-[30px] {% if status_filter == 'overdue' %} text-blue-500 {% endif %}">
+                        {{ counts.overdue }}
+                    </h1>
                 </div>
-                <div class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl">
-                    <h1 class="text-center text-[36px]">กำลังทำ</h1>
-                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px]" data-target="50">0</h1>
+            
+                <!-- To Check -->
+                <div 
+                    onclick="applyFilter('to_check')" 
+                    class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl cursor-pointer hover:scale-105 transition-transform duration-300"
+                >
+                    <h1 class="text-center text-[36px] {% if status_filter == 'to_check' %} text-blue-500 {% endif %}">
+                        รอตรวจสอบ
+                    </h1>
+                    <h1 class="text-center 2xl:mt-6 mt-4 text-[30px] {% if status_filter == 'to_check' %} text-blue-500 {% endif %}">
+                        {{ counts.to_check }}
+                    </h1>
                 </div>
             </div>
+            
+            
 
             <div class="mx-12 2xl:mx-44 mt-12 flex justify-center gap-20 text-2xl">
                 <button onclick="location.href='{% url 'project_list' %}'"  
@@ -154,7 +279,24 @@
 
         </div>
     </div>
-
+    
+    <script>
+        function applyFilter(status) {
+            const queryParams = new URLSearchParams(window.location.search);
+            const currentStatus = queryParams.get('status');
+    
+            // If the clicked status is already selected, reset to default (clear the filter)
+            if (currentStatus === status) {
+                queryParams.delete('status'); // Remove the status parameter
+            } else {
+                queryParams.set('status', status); // Set the status parameter
+            }
+    
+            window.location.search = queryParams.toString(); // Refresh the page with the updated filter
+        }
+    </script>
+    
+    
     <script>
         // JavaScript สำหรับเพิ่มเอฟเฟกต์การนับเลข
         document.addEventListener('DOMContentLoaded', function () {
