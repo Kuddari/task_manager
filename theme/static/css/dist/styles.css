@@ -880,6 +880,10 @@ select {
   left: 0px;
 }
 
+.left-80 {
+  left: 20rem;
+}
+
 .right-0 {
   right: 0px;
 }
@@ -894,6 +898,10 @@ select {
 
 .top-6 {
   top: 1.5rem;
+}
+
+.right-6 {
+  right: 1.5rem;
 }
 
 .isolate {
@@ -914,10 +922,6 @@ select {
 
 .z-50 {
   z-index: 50;
-}
-
-.z-\[9999\] {
-  z-index: 9999;
 }
 
 .col-span-2 {
@@ -2236,6 +2240,11 @@ select {
   background-color: rgb(185 28 28 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-yellow-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(202 138 4 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:bg-opacity-80:hover {
   --tw-bg-opacity: 0.8;
 }
@@ -2253,6 +2262,11 @@ select {
 .hover\:text-green-700:hover {
   --tw-text-opacity: 1;
   color: rgb(21 128 61 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-red-700:hover {
+  --tw-text-opacity: 1;
+  color: rgb(185 28 28 / var(--tw-text-opacity, 1));
 }
 
 .hover\:underline:hover {
@@ -2278,10 +2292,6 @@ select {
 .focus\:ring-blue-500:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(59 130 246 / var(--tw-ring-opacity, 1));
-}
-
-.group:hover .group-hover\:flex {
-  display: flex;
 }
 
 .group:hover .group-hover\:text-gray-900 {

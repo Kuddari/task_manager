@@ -53,7 +53,9 @@
                     <div class="flex flex-col gap-4">
                         {% for task in tasks %}
                         <!-- Task Item -->
-                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md ">
+                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md transition-transform duration-300 hover:scale-105"
+                        onclick="showTaskDescriptionModal('{{ task.id }}')"
+                        >
                             <!-- Task Details -->
                             <div class="flex flex-col">
                                 <span class="text-sm font-medium text-gray-400">Task</span>
@@ -86,25 +88,42 @@
                            <!-- Task Status -->
                             <div class="flex flex-col items-center">
                                 <span class="text-sm font-medium text-gray-400">Status</span>
-                                <div class="flex space-x-2 mt-1">
+                                <div class="flex space-x-2 mt-1"
+                                onclick="event.stopPropagation()"
+                                >
                                     <!-- To Do -->
                                     {% if task.status == 'to_do' %}
-                                    <button 
-                                        type="button" 
-                                        id="status-button"
-                                        class="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-blue-200 hover:text-blue-700 transition"
-                                        onmouseover="hoverToInProgress(this)"
-                                        onmouseout="revertเริ่มทำ(this)"
-                                        onclick="updateStatus('{{ task.id }}', 'in_progress')"
-                                    >
-                                        To Do
-                                    </button>
+                                        {% if task.to_edit %}
+                                            <!-- Show Yellow "ต้องแก้" Button if to_edit is True -->
+                                            <button 
+                                                type="button" 
+                                                id="status-button"
+                                                class="bg-yellow-500 text-white text-xs font-medium px-2 py-1 rounded-full hover:bg-yellow-600 transition"
+                                                onclick="updateStatus('{{ task.id }}', 'in_progress'); console.log('Task ID sent to updateStatus:', '{{ task.id }}');"
+                                                onmouseover="hoverToInProgressFromEdit(this)"
+                                                onmouseout="revertToEdit(this)"
+                                            >
+                                                ต้องแก้
+                                            </button>
+                                        {% else %}
+                                            <!-- Default To Do Button -->
+                                            <button 
+                                                type="button" 
+                                                id="status-button"
+                                                class="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-blue-200 hover:text-blue-700 transition"
+                                                onmouseover="hoverToInProgress(this)"
+                                                onmouseout="revertToDo(this)"
+                                                onclick="updateStatus('{{ task.id }}', 'in_progress'); console.log('Task ID sent to updateStatus:', '{{ task.id }}');"
+                                            >
+                                                To Do
+                                            </button>
+                                        {% endif %}
                                     {% elif task.status == 'in_progress' %}
                                     <!-- In Progress -->
                                     <button 
                                         type="button" 
                                         class="bg-blue-200 text-blue-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-green-200 hover:text-green-700 transition"
-                                        onmouseover="hoverเริ่มทำne(this)"
+                                        onmouseover="hoverDone(this)"
                                         onmouseout="revertInProgress(this)"
                                         onclick="console.log('Task ID:', '{{ task.id }}'); showConfirmationModal('{{ task.id }}')"  
                                     >
@@ -155,7 +174,8 @@
           
    
            <!-- Create New Project Form - Popup Modal -->
-           <div id="projectModal" class="z-50 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
+           <div id="projectModal" class="z-50 hidden fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur"
+                >
                <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
                    <div class="flex justify-between">
                        <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
@@ -284,10 +304,10 @@
                 onclick="applyFilter('is_checked', 'false')" 
                 class="bg-gradient-to-b from-blue-400 drop-shadow-md shadow-md shadow-blue-500 bg-backdrop-blur md:w-48 h-44 2xl:w-56 2xl:h-52 py-3 text-white rounded-3xl cursor-pointer hover:scale-105 transition-transform duration-300"
                 >
-                <h1 class="text-center text-[36px] {% if is_checked_filter == 'false' and status_filter == 'done' %} text-blue-500 {% endif %}">
+                <h1 class="text-center text-[36px] {% if is_checked_filter == 'false' %} text-blue-500 {% endif %}">
                     รอตรวจ
                 </h1>
-                <h1 class="text-center 2xl:mt-6 mt-4 text-[30px] {% if is_checked_filter == 'false' and status_filter == 'done' %} text-blue-500 {% endif %}">
+                <h1 class="text-center 2xl:mt-6 mt-4 text-[30px] {% if is_checked_filter == 'false'  %} text-blue-500 {% endif %}">
                     {{ counts.to_check }}
                 </h1>
                 </div>
@@ -307,109 +327,160 @@
     </div>
     
     <!-- Confirmation Modal -->
-<div id="confirmationModal" class="fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center hidden z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-        <!-- Modal Header -->
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-lg font-semibold text-gray-800">ยืนยันการส่งงาน</h2>
-            <button 
-                onclick="hideConfirmationModal()" 
-                class="text-gray-400 hover:text-gray-600 text-xl font-bold focus:outline-none"
-            >
-                &times;
-            </button>
+    <div id="confirmationModal" class="fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center hidden z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+            <!-- Modal Header -->
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-semibold text-gray-800">ยืนยันการส่งงาน</h2>
+                <button 
+                    onclick="hideConfirmationModal()" 
+                    class="text-gray-400 hover:text-gray-600 text-xl font-bold focus:outline-none"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <form id="submissionForm" class="space-y-4">
+                <!-- File Upload -->
+                <div>
+                    <label for="fileUpload" class="block text-sm font-medium text-gray-700">แนบไฟล์</label>
+                    <input 
+                        type="file" 
+                        id="fileUpload" 
+                        name="fileUpload" 
+                        class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                </div>
+
+                <!-- URL Input -->
+                <div>
+                    <label for="urlInput" class="block text-sm font-medium text-gray-700">เพิ่ม URL</label>
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        name="urlInput" 
+                        placeholder="https://example.com" 
+                        class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    >
+                </div>
+
+                <!-- Details Textarea -->
+                <div>
+                    <label for="detailsInput" class="block text-sm font-medium text-gray-700">รายละเอียด</label>
+                    <textarea 
+                        id="detailsInput" 
+                        name="detailsInput" 
+                        rows="4" 
+                        class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="เขียนรายละเอียดงาน..."
+                    ></textarea>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex justify-end space-x-3">
+                    <button 
+                        type="button" 
+                        onclick="hideConfirmationModal()" 
+                        class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm"
+                    >
+                        ยกเลิก
+                    </button>
+                    <button 
+                        type="button" 
+                        onclick="submitConfirmation()" 
+                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+                    >
+                        ยืนยัน
+                    </button>
+                </div>
+            </form>
         </div>
+    </div>
+    
+    <!-- Task Description Modal -->
+    <div id="taskDescriptionModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
 
-        <!-- Modal Content -->
-        <form id="submissionForm" class="space-y-4">
-            <!-- File Upload -->
-            <div>
-                <label for="fileUpload" class="block text-sm font-medium text-gray-700">แนบไฟล์</label>
-                <input 
-                    type="file" 
-                    id="fileUpload" 
-                    name="fileUpload" 
-                    class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
+            <!-- Modal Header -->
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">รายละเอียดงาน</h2>
 
-            <!-- URL Input -->
-            <div>
-                <label for="urlInput" class="block text-sm font-medium text-gray-700">เพิ่ม URL</label>
-                <input 
-                    type="url" 
-                    id="urlInput" 
-                    name="urlInput" 
-                    placeholder="https://example.com" 
-                    class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                >
-            </div>
-
-            <!-- Details Textarea -->
-            <div>
-                <label for="detailsInput" class="block text-sm font-medium text-gray-700">รายละเอียด</label>
-                <textarea 
-                    id="detailsInput" 
-                    name="detailsInput" 
-                    rows="4" 
-                    class="mt-1 block w-full text-sm border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                    placeholder="เขียนรายละเอียดงาน..."
-                ></textarea>
+            <!-- Task Details Content -->
+            <div id="taskDescriptionContent">
+                <!-- Task details will be dynamically inserted here -->
             </div>
 
             <!-- Modal Actions -->
-            <div class="flex justify-end space-x-3">
+            <div class="flex justify-end mt-4 space-x-2">
+                
+
+                <!-- Cancel Button -->
                 <button 
-                    type="button" 
-                    onclick="hideConfirmationModal()" 
-                    class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm"
+                    id="cancelButton"
+                    class="bg-gray-500 text-white text-sm px-4 py-2 rounded-md"
+                    onclick="hideTaskDescriptionModal()"
                 >
                     ยกเลิก
                 </button>
+
+                <!-- Update Status to "In Progress" -->
                 <button 
-                    type="button" 
-                    onclick="submitConfirmation()" 
-                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+                    id="updateStatusButton"
+                    class="bg-blue-500 text-white text-sm px-4 py-2 rounded-md"
+                    onclick="updateStatus(window.currentTaskId, 'in_progress')"
                 >
-                    ยืนยัน
+                    กำลังจะทำ
                 </button>
             </div>
-        </form>
-    </div>
-</div>
-
-<!-- Task Details Modal -->
-<div id="taskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-96">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">ตรวจสอบงาน</h2>
-        <div id="taskDetailsContent">
-            <!-- Task details will be dynamically inserted here -->
-        </div>
-        <div class="flex justify-end mt-4 space-x-2">
-            <button 
-                class="bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-md" 
-                onclick="hideTaskDetailsModal()"
-            >
-                ยกเลิก
-            </button>
-            <button 
-                id="approveButton"
-                class="bg-green-500 text-white text-sm px-4 py-2 rounded-md"
-                onclick="approveTask()"
-            >
-                ผ่าน
-            </button>
-            <button 
-                id="editButton"
-                class="bg-yellow-500 text-white text-sm px-4 py-2 rounded-md"
-                onclick="editTask()"
-            >
-                แก้ไข
-            </button>
         </div>
     </div>
-</div>
 
+
+
+    <div id="taskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50" >
+        <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
+            <!-- Close Button -->
+            <button 
+                onclick="hideTaskDetailsModal()" 
+                class="absolute top-6 left-80 text-red-500 text-xl font-bold focus:outline-none hover:text-red-700"
+            >
+                &times;
+            </button>
+
+    
+            <!-- Modal Header -->
+            <h2 class="text-lg font-semibold text-gray-800 mb-4">ตรวจสอบงาน</h2>
+    
+            <!-- Task Details Content -->
+            <div id="taskDetailsContent">
+                <!-- Task details will be dynamically inserted here -->
+            </div>
+    
+            <!-- Modal Actions -->
+            <div class="flex justify-end mt-4 space-x-2">
+
+                <!-- Edit Button -->
+                <button 
+                    id="editButton"
+                    class="bg-yellow-500 text-white text-sm px-4 py-2 rounded-md"
+                    onclick="editTask()"
+                >
+                    ต้องแก้
+                </button>
+                <!-- Approve Button -->
+                <button 
+                    id="approveButton"
+                    class="bg-green-500 text-white text-sm px-4 py-2 rounded-md"
+                    onclick="approveTask()"
+                >
+                    ผ่าน
+                </button>
+    
+                
+            </div>
+        </div>
+    </div>
+    
 
     <script>
        function applyFilter(filterKey, filterValue) {
@@ -451,7 +522,7 @@
         }
     
         // Function to revert appearance to "To Do" on mouse out
-        function revertเริ่มทำ(button) {
+        function revertToDo(button) {
             if (button.innerText === 'In Progress') {
                 button.classList.remove('bg-blue-200', 'text-blue-700');
                 button.classList.add('bg-gray-200', 'text-gray-700');
@@ -460,7 +531,7 @@
         }
 
         // Function to change appearance to "Done" on hover
-        function hoverเริ่มทำne(button) {
+        function hoverDone(button) {
             if (button.innerText === 'In Progress') {
                 button.classList.remove('bg-blue-200', 'text-blue-700');
                 button.classList.add('bg-green-200', 'text-green-700');
@@ -476,28 +547,65 @@
                 button.innerText = 'In Progress';
             }
         }
+
+        // Change "ต้องแก้" to "In Progress" when hovering
+        function hoverToInProgressFromEdit(button) {
+            if (button.innerText === 'ต้องแก้') {
+                button.classList.remove('bg-yellow-500', 'text-white');
+                button.classList.add('bg-blue-200', 'text-blue-700');
+                button.innerText = 'In Progress';
+            }
+        }
+
+        // Revert back to "ต้องแก้" when mouse leaves
+        function revertToEdit(button) {
+            if (button.innerText === 'In Progress') {
+                button.classList.remove('bg-blue-200', 'text-blue-700');
+                button.classList.add('bg-yellow-500', 'text-white');
+                button.innerText = 'ต้องแก้';
+            }
+        }
+
         
-        // Function to update the task status
         function updateStatus(taskId, status) {
-            fetch(`/update-task-status/`, {
+            console.log('Updating status for Task ID:', taskId, 'to status:', status); // Debug input
+
+            fetch('/update-task-status/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}', // Include CSRF token for Django
+                    'X-CSRFToken': '{{ csrf_token }}',
                 },
                 body: JSON.stringify({ task_id: taskId, status: status }),
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Received response from server:', response); // Log response
+
+                if (!response.ok) {
+                    // If response is not OK, log and throw an error
+                    return response.text().then(text => {
+                        console.error('Response text:', text); // Log response text
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json(); // Parse JSON if the response is OK
+            })
             .then(data => {
+                console.log('Server returned data:', data); // Log server response JSON
                 if (data.success) {
-                    // Reload the page or update the UI dynamically
-                    location.reload();
+                    console.log('Status update successful.'); // Log success
+                    location.reload(); // Reload the page if successful
                 } else {
-                    alert('Failed to update status.');
+                    console.error('Failed to update status:', data.error); // Log error message
+                    alert('Failed to update status: ' + (data.error || 'Unknown error'));
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error occurred:', error.message); // Log the error
+                alert('Something went wrong. Check the console for details.');
+            });
         }
+
     </script>
 
     <script>
@@ -514,7 +622,7 @@
             document.getElementById('confirmationModal').classList.add('hidden');
         }
 
-        function submitConfirmation() {
+        function submitConfirmation() { 
             console.log("Task ID during submission:", window.currentTaskId); // Debug task ID
 
             if (!window.currentTaskId) {
@@ -525,6 +633,10 @@
             const fileUpload = document.getElementById('fileUpload').files[0];
             const urlInput = document.getElementById('urlInput').value;
             const detailsInput = document.getElementById('detailsInput').value;
+
+            console.log("File Upload:", fileUpload);
+            console.log("URL Input:", urlInput);
+            console.log("Details Input:", detailsInput);
 
             const formData = new FormData();
             formData.append('task_id', window.currentTaskId); // Use the globally stored task ID
@@ -541,8 +653,8 @@
             })
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Response:", data); // Debug the server response
                     if (data.success) {
-                        // Update the UI without alerting the user
                         location.reload(); // Reload page after success
                     } else {
                         alert('เกิดข้อผิดพลาด: ' + data.error);
@@ -552,12 +664,65 @@
 
             hideConfirmationModal(); // Hide modal after submission
         }
-        
+
+        function showTaskDescriptionModal(taskId) {
+    console.log("Opening task description modal for Task ID:", taskId);
+    window.currentTaskId = taskId; // Store task ID globally
+
+    fetch(`/get-task-details/${taskId}/`)
+        .then(response => response.json())
+        .then(data => {
+            const taskDescriptionContent = document.getElementById('taskDescriptionContent');
+            taskDescriptionContent.innerHTML = `
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-700">งาน:</p>
+                    <p class="text-gray-800 font-semibold">${data.title}</p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-700">รายละเอียด:</p>
+                    <p class="text-gray-800">${data.description || 'ไม่มีรายละเอียด'}</p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-700">สร้างโดย:</p>
+                    <p class="text-gray-800">${data.created_by}</p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-sm font-medium text-gray-700">ไฟล์ที่แนบ:</p>
+                    ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
+                </div>
+            `;
+            document.getElementById('taskDescriptionModal').classList.remove('hidden');
+        })
+        .catch(error => console.error('Error fetching task details:', error));
+}
+
+function hideTaskDescriptionModal() {
+    document.getElementById('taskDescriptionModal').classList.add('hidden');
+}
+
+       
 
         function showTaskDetailsModal(taskId) {
+                console.log("Task ID received:", taskId); // Log taskId received in the function
+
+                if (!taskId) {
+                    console.error("Task ID is missing when opening the modal."); // Log an error if taskId is missing
+                    alert("Task ID is missing. Please try again.");
+                    return;
+                }
+
+                // Store taskId globally for later use
+                window.currentTaskId = taskId;
+                console.log("Task ID stored globally:", window.currentTaskId); // Confirm storage in global variable
+
                 // Fetch task details from the server
                 fetch(`/get-task-details/${taskId}/`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch task details: HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         const taskDetailsContent = document.getElementById('taskDetailsContent');
                         taskDetailsContent.innerHTML = `
@@ -574,25 +739,95 @@
                                 <p class="text-gray-800">${data.details || 'ไม่มีรายละเอียด'}</p>
                             </div>
                         `;
+
+                        // Show the modal
                         document.getElementById('taskDetailsModal').classList.remove('hidden');
                     })
-                    .catch(error => console.error('Error fetching task details:', error));
+                    .catch(error => {
+                        console.error("Error fetching task details:", error); // Log errors
+                        alert("ไม่สามารถโหลดรายละเอียดของงานได้ กรุณาลองใหม่");
+                    });
             }
-
             function hideTaskDetailsModal() {
+                console.log("Hiding task details modal."); // Log when hiding the modal
                 document.getElementById('taskDetailsModal').classList.add('hidden');
             }
 
             function approveTask() {
-                alert('ผ่าน! Task approved.');
-                hideTaskDetailsModal();
-                // Send approval to the server
+                console.log("Approving task with Task ID:", window.currentTaskId); // Log taskId being approved
+
+                if (!window.currentTaskId) {
+                    console.error("Task ID is missing for approval."); // Log an error
+                    alert("Task ID is missing. Please try again.");
+                    return;
+                }
+
+                fetch('/update-task-check-status/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ task_id: window.currentTaskId, action: 'approve' }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to approve task: HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            console.log("Task approved successfully."); // Log success
+                            location.reload(); // Reload the page
+                        } else {
+                            console.error("Error approving task:", data.error); // Log error from the server
+                            alert("ไม่สามารถยืนยันงานได้: " + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error during approval:", error); // Log unexpected errors
+                        alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+                    });
             }
 
+
             function editTask() {
-                alert('แก้ไข! Task needs corrections.');
-                hideTaskDetailsModal();
-                // Send edit request to the server
+                console.log("Editing task with Task ID:", window.currentTaskId); // Log taskId being edited
+
+                if (!window.currentTaskId) {
+                    console.error("Task ID is missing for editing."); // Log an error
+                    alert("Task ID is missing. Please try again.");
+                    return;
+                }
+
+                fetch('/update-task-check-status/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: JSON.stringify({ task_id: window.currentTaskId, action: 'edit' }),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to edit task: HTTP ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            console.log("Task edited successfully."); // Log success
+                            location.reload(); // Reload the page
+                        } else {
+                            console.error("Error editing task:", data.error); // Log error from the server
+                            alert("ไม่สามารถแก้ไขงานได้: " + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error during edit:", error); // Log unexpected errors
+                        alert("เกิดข้อผิดพลาด กรุณาลองใหม่");
+                    });
             }
 
 

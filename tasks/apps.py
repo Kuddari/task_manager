@@ -23,4 +23,4 @@ class TasksAppConfig(AppConfig):
                 overdue_tasks.update(is_overdue=True)
                 Task.objects.filter(is_overdue=True, status='done').update(is_overdue=False)
 
-            time.sleep(300)  # Wait 5 minutes
+            time.sleep(3000)  # Wait 5 minutes

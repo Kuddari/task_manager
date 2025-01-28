@@ -98,7 +98,7 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='to_do')
     is_overdue = models.BooleanField(default=False)
     attachment = models.FileField(upload_to='task_attachments/', null=True, blank=True)
-
+    to_edit = models.BooleanField(default=False)
     status_updated_at = models.DateTimeField(null=True, blank=True)
     # New Fields
     url = models.URLField(max_length=500, null=True, blank=True)  # URL field

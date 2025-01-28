@@ -14,6 +14,9 @@ from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
 import json
 from django.views.decorators.csrf import csrf_exempt  # Add this import
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def user_login(request):
@@ -516,6 +519,7 @@ def tasks_list(request):
     
     # Calculate counts for each task status
     counts = {
+        'to_do': Task.objects.filter(status='to_do', assigned_to=request.user).count(),
         'in_progress': Task.objects.filter(status='in_progress', assigned_to=request.user).count(),
         'done': Task.objects.filter(status='done', assigned_to=request.user).count(),
         'overdue': Task.objects.filter(is_overdue=True, assigned_to=request.user).count(),  # Count overdue tasks
@@ -530,12 +534,17 @@ def tasks_list(request):
         'counts': counts,
     })
 
+@csrf_exempt
 def update_task_status(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
+            logger.debug('Received data: %s', data)  # Log incoming data
             task_id = data.get('task_id')
             status = data.get('status')
+
+            if not task_id or not status:
+                return JsonResponse({'success': False, 'error': 'Missing task_id or status'})
 
             task = Task.objects.get(id=task_id)
             task.status = status
@@ -543,18 +552,31 @@ def update_task_status(request):
 
             return JsonResponse({'success': True})
         except Task.DoesNotExist:
+            logger.error('Task not found for ID: %s', task_id)
             return JsonResponse({'success': False, 'error': 'Task not found'})
+        except json.JSONDecodeError:
+            logger.error('Invalid JSON received')
+            return JsonResponse({'success': False, 'error': 'Invalid JSON'})
         except Exception as e:
+            logger.error('Error: %s', str(e))
             return JsonResponse({'success': False, 'error': str(e)})
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    else:
+        logger.error('Invalid request method: %s', request.method)
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
-def submit_task(request):
+def submit_task(request): 
     if request.method == 'POST':
         try:
             task_id = request.POST.get('task_id')
             url_input = request.POST.get('urlInput')
             details_input = request.POST.get('detailsInput')
             file_upload = request.FILES.get('fileUpload')
+
+            # Debugging logs
+            print(f"Task ID: {task_id}")
+            print(f"URL Input: {url_input}")
+            print(f"Details Input: {details_input}")
+            print(f"File Upload: {file_upload}")
 
             # Fetch the task
             task = Task.objects.get(id=task_id)
@@ -575,6 +597,7 @@ def submit_task(request):
         except Task.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Task not found'})
         except Exception as e:
+            print(f"Error: {e}")  # Debug unexpected errors
             return JsonResponse({'success': False, 'error': str(e)})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
@@ -585,7 +608,10 @@ def get_task_details(request, task_id):
         data = {
             'file_url': task.attachment.url if task.attachment else None,
             'url': task.url,
+            'title': task.title,
             'details': task.details,
+            'description': task.description,
+            'created_by': task.created_by.get_full_name() if task.created_by else "Unknown",
         }
         return JsonResponse(data)
     except Task.DoesNotExist:
@@ -648,20 +674,57 @@ def get_project_progress(request, project_id):
         return JsonResponse({'success': False, 'error': 'Project not found'}, status=404)
 
 @csrf_exempt
-def update_task_status(request, task_id):
+def update_task_status(request):
     if request.method == 'POST':
-        print(f"Received Task ID: {task_id}")
         try:
-            data = json.loads(request.body)
-            status = data.get('status')
-            print(f"New Status: {status}")
-            
+            data = json.loads(request.body)  # Parse JSON body
+            task_id = data.get('task_id')  # Get task_id from request body
+            status = data.get('status')  # Get status from request body
+
+            # Validate inputs
+            if not task_id or not status:
+                return JsonResponse({'success': False, 'error': 'Missing task_id or status'})
+
+            # Fetch and update the task
             task = Task.objects.get(id=task_id)
             task.status = status
             task.save()
-            return JsonResponse({'success': True, 'status': task.status, 'project_id': task.project_id})
+
+            return JsonResponse({'success': True})
         except Task.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
+            return JsonResponse({'success': False, 'error': 'Task not found'})
         except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=500)
-    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@csrf_exempt
+def update_task_check_status(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            task_id = data.get('task_id')
+            action = data.get('action')  # Action: "approve" or "edit"
+
+            # Validate task_id
+            if not task_id:
+                return JsonResponse({'success': False, 'error': 'Task ID is required'})
+
+            # Get the task
+            task = Task.objects.get(id=task_id)
+
+            if action == 'approve':
+                task.is_checked = True  # Set is_checked to True
+            elif action == 'edit':
+                task.status = 'to_do'  # Change status to 'to_do'
+                task.to_edit = True  # Assume `to_edit` is a field in your model
+            else:
+                return JsonResponse({'success': False, 'error': 'Invalid action'})
+
+            task.save()  # Save changes to the database
+            return JsonResponse({'success': True})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
