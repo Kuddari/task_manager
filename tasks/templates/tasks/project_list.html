@@ -53,24 +53,24 @@
                     <div class="flex flex-col gap-4">
                         {% for task in tasks %}
                         <!-- Task Item -->
-                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md">
+                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md ">
                             <!-- Task Details -->
                             <div class="flex flex-col">
-                                <span class="text-sm font-medium text-gray-500">Task</span>
+                                <span class="text-sm font-medium text-gray-400">Task</span>
                                 <span class="text-lg font-semibold">{{ task.title }}</span>
                             </div>
             
                             <!-- Due Date -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-500">Due Date</span>
-                                <span class="text-md font-semibold {% if task.is_overdue %} text-red-500 {% else %} text-gray-700 {% endif %}">
+                                <span class="text-sm font-medium text-gray-400">Due Date</span>
+                                <span class="text-md font-semibold {% if task.is_overdue %} text-red-500 {% else %} text-slate-300 {% endif %}">
                                     {{ task.due_date|date:"d/m/Y"|default:"No Due Date" }}
                                 </span>
                             </div>
             
                             <!-- Task Priority -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-500">Priority</span>
+                                <span class="text-sm font-medium text-gray-400">Priority</span>
                                 <span class="text-md font-semibold">
                                     {% if task.priority == 'High' %}
                                     <span class="text-red-500">High</span>
@@ -81,10 +81,11 @@
                                     {% endif %}
                                 </span>
                             </div>
-            
+
+
                            <!-- Task Status -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-500">Status</span>
+                                <span class="text-sm font-medium text-gray-400">Status</span>
                                 <div class="flex space-x-2 mt-1">
                                     <!-- To Do -->
                                     {% if task.status == 'to_do' %}
@@ -93,7 +94,7 @@
                                         id="status-button"
                                         class="bg-gray-200 text-gray-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-blue-200 hover:text-blue-700 transition"
                                         onmouseover="hoverToInProgress(this)"
-                                        onmouseout="revertToDo(this)"
+                                        onmouseout="revertเริ่มทำ(this)"
                                         onclick="updateStatus('{{ task.id }}', 'in_progress')"
                                     >
                                         To Do
@@ -103,7 +104,7 @@
                                     <button 
                                         type="button" 
                                         class="bg-blue-200 text-blue-700 text-xs font-medium px-2 py-1 rounded-full hover:bg-green-200 hover:text-green-700 transition"
-                                        onmouseover="hoverToDone(this)"
+                                        onmouseover="hoverเริ่มทำne(this)"
                                         onmouseout="revertInProgress(this)"
                                         onclick="console.log('Task ID:', '{{ task.id }}'); showConfirmationModal('{{ task.id }}')"  
                                     >
@@ -306,7 +307,7 @@
     </div>
     
     <!-- Confirmation Modal -->
-<div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-90 backdrop-blur-md flex justify-center items-center hidden z-50">
+<div id="confirmationModal" class="fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center hidden z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         <!-- Modal Header -->
         <div class="flex justify-between items-center mb-4">
@@ -378,7 +379,7 @@
 </div>
 
 <!-- Task Details Modal -->
-<div id="taskDetailsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+<div id="taskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50">
     <div class="bg-white rounded-lg shadow-lg p-6 w-96">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">ตรวจสอบงาน</h2>
         <div id="taskDetailsContent">
@@ -450,7 +451,7 @@
         }
     
         // Function to revert appearance to "To Do" on mouse out
-        function revertToDo(button) {
+        function revertเริ่มทำ(button) {
             if (button.innerText === 'In Progress') {
                 button.classList.remove('bg-blue-200', 'text-blue-700');
                 button.classList.add('bg-gray-200', 'text-gray-700');
@@ -459,7 +460,7 @@
         }
 
         // Function to change appearance to "Done" on hover
-        function hoverToDone(button) {
+        function hoverเริ่มทำne(button) {
             if (button.innerText === 'In Progress') {
                 button.classList.remove('bg-blue-200', 'text-blue-700');
                 button.classList.add('bg-green-200', 'text-green-700');
@@ -562,11 +563,11 @@
                         taskDetailsContent.innerHTML = `
                             <div class="mb-4">
                                 <p class="text-sm font-medium text-gray-700">ไฟล์ที่ส่ง:</p>
-                                ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-500">ไม่มีไฟล์</p>'}
+                                ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
                             </div>
                             <div class="mb-4">
                                 <p class="text-sm font-medium text-gray-700">URL:</p>
-                                ${data.url ? `<a href="${data.url}" target="_blank" class="text-blue-500 underline">${data.url}</a>` : '<p class="text-gray-500">ไม่มี URL</p>'}
+                                ${data.url ? `<a href="${data.url}" target="_blank" class="text-blue-500 underline">${data.url}</a>` : '<p class="text-gray-400">ไม่มี URL</p>'}
                             </div>
                             <div class="mb-4">
                                 <p class="text-sm font-medium text-gray-700">รายละเอียด:</p>

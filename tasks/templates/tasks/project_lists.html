@@ -15,7 +15,7 @@
      <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
 </head>
-<body>
+<body >
     {% block content %}
     <div class="min-h-screen ml-48 bg-gray-100">
         <div class="flex px-12 py-4 gap-x-8 bg-white">
@@ -102,7 +102,7 @@
         {% for project in projects %}
   
           <div id="Editproject{{project.id}}" class="hidden z-50  fixed inset-0  bg-gray-500 bg-opacity-25  flex justify-center items-center backdrop-blur">
-              <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl min-h-[500px] max-h-[600px] overflow-auto">
+              <div class="bg-white  opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl">
                   <div class="flex justify-between">
                       <h3 class="text-lg font-semibold">แก้ไขโครงการ</h3>
                       <!-- Close Button -->
@@ -134,7 +134,7 @@
                                 id="description_{{ project.id }}" 
                                 name="description" 
                                 class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
-                                rows="3" 
+                                rows="2" 
                                 required
                             >{{ project.description }}</textarea>
                         </div>
@@ -278,7 +278,7 @@
 <div id="projectModal" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
     <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl">
       <div class="flex justify-between">
-        <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
+        <h3 class="text-lg font-semibold">สร้างงานโครงการใหม่</h3>
         <button onclick="closeProjectPopup()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">
           X
         </button>
@@ -418,7 +418,7 @@
 
      <div id="projectModal-Popup" class="{% if selected_project %}z-50 py-12 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center backdrop-blur drop-shadow-lg shadow-lg{% else %}hidden{% endif %}"
      >
-        <div class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12 overflow-y-auto">
+        <div  class="bg-white  opacity-85 backdrop-blur  rounded-lg shadow-lg w-11/12">
             <div class="flex justify-between bg-blue-500">
                 <div class="p-12 text-white">
                     <h1 class="text-3xl font-semibold">{{ selected_project.name }}</h1>
@@ -433,48 +433,50 @@
                  <!-- Circle Progress Bar -->
                  <div class="flex items-center justify-center w-[90px] h-[90px] mr-12">
                   <svg class="w-full h-full" viewBox="0 0 36 36">
-                    <!-- Background Circle -->
-                    <circle
-                      class="fill-none stroke-gray-300" 
-                      cx="18"
-                      cy="18"
-                      r="15.91549431"
-                      stroke-width="3.8"
-                      transform="rotate(-90 18 18)"
-                    ></circle>
-                
-                    <!-- Progress Circle -->
-                    <circle
-                      class="fill-none stroke-green-500 transition-[stroke-dasharray] duration-600 ease-in-out"
-                      cx="18"
-                      cy="18"
-                      r="15.91549431"
-                      style="stroke-dasharray: {{ selected_project.completion_percentage }}, 100"
-                      stroke-width="3.8"
-                      stroke-linecap="round"
-                      transform="rotate(-90 18 18)"
-                    ></circle>
-                
-                    <!-- Background for Text -->
-                    <circle
-                      class="fill-white"
-                      cx="18"
-                      cy="18"
-                      r="14.2"
-                    ></circle>
-                
-                    <!-- Percentage Text -->
-                    <text
-                      class="fill-green-500 font-bold text-[0.5em]"
-                      x="18"
-                      y="18"
-                      text-anchor="middle"
-                      dominant-baseline="central"
-                    >
-                      {{ selected_project.completion_percentage|floatformat:0 }}%
-                    </text>
+                      <!-- Background Circle -->
+                      <circle
+                          class="fill-none stroke-gray-300" 
+                          cx="18"
+                          cy="18"
+                          r="15.91549431"
+                          stroke-width="3.8"
+                          transform="rotate(-90 18 18)"
+                      ></circle>
+              
+                      <!-- Progress Circle -->
+                      <circle
+                          id="projectProgressCircle"
+                          class="fill-none stroke-green-500 transition-[stroke-dasharray] duration-600 ease-in-out"
+                          cx="18"
+                          cy="18"
+                          r="15.91549431"
+                          style="stroke-dasharray: {{ selected_project.completion_percentage }}, 100"
+                          stroke-width="3.8"
+                          stroke-linecap="round"
+                          transform="rotate(-90 18 18)"
+                      ></circle>
+              
+                      <!-- Background for Text -->
+                      <circle
+                          class="fill-white"
+                          cx="18"
+                          cy="18"
+                          r="14.2"
+                      ></circle>
+              
+                      <!-- Percentage Text -->
+                      <text
+                          id="projectProgressText"
+                          class="fill-green-500 font-bold text-[0.5em]"
+                          x="18"
+                          y="18"
+                          text-anchor="middle"
+                          dominant-baseline="central"
+                      >
+                          {{ selected_project.completion_percentage|floatformat:0 }}%
+                      </text>
                   </svg>
-                </div>
+              </div>
                </div>
             </div>  
             
@@ -491,11 +493,8 @@
                   
                   <!-- เพิ่มงาน -->
                   <div>
-                    <div
-                      id="WorkModal-Popup"
-                      class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur"
-                    >
-                      <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto">
+                    <div id="WorkModal-Popup" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+                      <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl ">
                         <div class="flex justify-between">
                           <h3 class="text-lg font-semibold">สร้างงานใหม่</h3>
                           <!-- Close Button -->
@@ -584,8 +583,8 @@
                   
                           <!-- Status => Task.status -->
                           <!-- "กำลังทำงาน" => 'in_progress', "ไม่ทำงาน" => 'to_do' -->
-                          <div class="flex flex-col">
-                            <div>
+                          <!-- <div class="flex flex-col"> -->
+                            <!-- <div>
                               <label class="block text-sm font-medium text-black">สถานะ</label>
                               <div class="mt-1 flex space-x-4">
                                   <button 
@@ -605,27 +604,37 @@
                                       เสร็จสิ้น
                                   </button>
                               </div>
-                            </div>
-                            <!-- Hidden input to store status -->
-                            <input
+                            </div> -->
+                            <!-- <input
                               type="hidden"
                               id="task_status"
                               name="status"
                               value="to_do"
                             />
-                          </div>
+                          </div> -->
                   
                           <!-- (Optional) Attachment => Task.attachment -->
                           <div class="flex flex-col">
-                            <label for="attachment" class="block text-sm font-medium text-black">ไฟล์แนบ</label>
-                            <div class="mt-1">
+                            <label for="attachment_{{ task.id }}" class="block text-sm font-medium text-black mt-2">ไฟล์แนบ</label>
+                            <div class="mt-1 text-lg">
+                          
                               <input
-                                type="file"
-                                id="attachment"
-                                name="attachment"  
-                                class="block w-full p-2 border border-gray-300 rounded-md shadow-sm
-                                       focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              />
+                              type="file"
+                              id="attachment_{{ task.id }}"
+                              name="attachment"
+                              class="hidden"
+                              onchange="handleFileUpload(this, '{{ task.id }}')"
+                          />
+                      
+                          <!-- Custom Upload Button -->
+                          <button
+                              type="button"
+                              id="uploadButton_{{ task.id }}"
+                              onclick="document.getElementById('attachment_{{ task.id }}').click()"
+                              class="w-full text-left p-2 border border-gray-300 rounded-md shadow-sm text-lg text-gray-700  hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          >
+                              คลิกเพื่ออัพโหลดไฟล์
+                          </button>
                             </div>
                           </div>
                   
@@ -673,7 +682,7 @@
                     onchange="applyFilters()"
                 >
                     <option value="all" {% if not status_filter or status_filter == "all" %} selected {% endif %}>ทุกสถานะ</option>
-                    <option value="todo" {% if status_filter == "todo" %} selected {% endif %}>กำลังทำ</option>
+                    <option value="เริ่มทำ" {% if status_filter == "เริ่มทำ" %} selected {% endif %}>กำลังทำ</option>
                     <option value="in_progress" {% if status_filter == "in_progress" %} selected {% endif %}>ระหว่างดำเนินการ</option>
                     <option value="done" {% if status_filter == "done" %} selected {% endif %}>เสร็จสิ้น</option>
                 </select>
@@ -681,8 +690,8 @@
                 </div>
             </div>
 
-            <div class="mx-40 text-xl">
-                <div class="p-2 flex flex-col gap-6">
+            <div class="md:mx-2 lg:mx-40 text-xl  overflow-y-auto md:max-h-[60vh] lg:max-h-[48vh] 2xl:max-h-[58vh]">
+                <div class="p-2 flex flex-col gap-6 ">
                   {% for task in tasks %}
                     <table class="px-8 bg-gray-100 table-auto w-full border-collapse rounded-lg drop-shadow-lg shadow-lg">
                         <thead class="">
@@ -691,7 +700,7 @@
                                 <th class="px-4 py-2 w-1/6">วันที่เริ่มต้น</th>
                                 <th class="px-4 py-2 w-1/6">วันที่สิ้นสุด</th>
                                 <th class="px-4 py-2 w-1/4">ผู้รับผิดชอบ</th>
-                                <th class="px-4 py-2 w-1/6">สถานะ</th>
+                                <th class="py-2 w-1/6">สถานะ</th>
                                 <th class="px-4 py-2 w-1/6"></th>
 
                             </tr>
@@ -702,8 +711,18 @@
                                 <td class="px-4 py-2">{{ task.created_at|date:"d/m/Y" }}</td>
                                 <td class="px-4 py-2">{{ task.due_date|date:"d/m/Y" }}</td>
                                 <td class="px-4 py-2">{{ task.assigned_to }}</td>
-                                <td class="px-4 py-2">{{ task.get_status_display }}</td>
-                                <td class="">
+                                <td class="py-2">
+                                  <button
+                                      type="button"
+                                      id="statusToggle_{{ task.id }}"
+                                      onclick="toggleTaskStatus('{{ task.id }}')"
+                                      class="status-btn px-2 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100 
+                                      {% if task.status == 'to_do' %}text-gray-600 bg-gray-100{% elif task.status == 'in_progress' %}text-blue-600 bg-blue-100{% elif task.status == 'done' %}text-green-600 bg-green-100{% endif %}"
+                                  >
+                                      {% if task.status == 'to_do' %}เริ่มทำ{% elif task.status == 'in_progress' %}กำลังดำเนินการ{% elif task.status == 'done' %}เสร็จสิ้น{% endif %}
+                                  </button>
+                              </td>
+                              <td>
                                   <div class="relative -mt-10 mx-5">
                                   <svg class="w-8 h-8 cursor-pointer" onclick="openWorkPopup{{ task.id }}(event)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
                                       <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z"/>
@@ -774,7 +793,7 @@
 
                 <!-- Description => Task.description -->
                 <div class="flex flex-col">
-                  <label for="description_{{ task.id }}" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                  <label for="description_{{ task.id }}" class="block text-sm font-medium text-black mt-2">ใส่รายละเอียด</label>
                   <div class="mt-1">
                     <textarea
                       id="description_{{ task.id }}"
@@ -788,7 +807,7 @@
 
                 <!-- Assigned To => Task.assigned_to -->
                 <div class="flex flex-col">
-                  <label for="assigned_to_{{ task.id }}" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                  <label for="assigned_to_{{ task.id }}" class="block text-sm font-medium text-black mt-2">ชื่อสมาชิก</label>
                   <div class="mt-1">
                     <select
                       id="assigned_to_{{ task.id }}"
@@ -812,7 +831,7 @@
                 <!-- Due Date => Task.due_date -->
           
                   <div class="flex flex-col">
-                    <label for="due_date_{{ task.id }}" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                    <label for="due_date_{{ task.id }}" class="block text-sm font-medium text-black mt-2">วันที่สิ้นสุด</label>
                     <div class="mt-1">
                       <input
                         type="text"
@@ -828,9 +847,9 @@
 
 
                 <!-- Status => Task.status -->
-                <div class="flex flex-col">
-                  <div>
-                    <label class="block text-sm font-medium text-black">สถานะ</label>
+                <!-- <div class="flex flex-col"> -->
+                  <!-- <div>
+                    <label class="block text-sm font-medium text-black mt-2">สถานะ</label>
                     <div class="mt-1 flex space-x-4">
                       <button 
                         type="button"
@@ -849,20 +868,38 @@
                         เสร็จสิ้น
                       </button>
                     </div>
-                  </div>
+                  </div> -->
                   <!-- Hidden input to store status -->
-                  <input
+                  <!-- <input
                     type="hidden"
                     id="task_status_{{ task.id }}"
                     name="status"
                     value="{{ task.status }}"
                   />
 
-                </div>
+                </div> -->
 
                 <div class="flex flex-col">
-                  <label for="attachment_{{ task.id }}" class="block text-sm font-medium text-black">ไฟล์แนบ</label>
-                  <div class="mt-1">
+                  <label for="attachment_{{ task.id }}" class="block text-sm font-medium text-black mt-2">ไฟล์แนบ</label>
+                  <div class="mt-1 text-lg">
+                
+                    <input
+                    type="file"
+                    id="attachment_{{ task.id }}"
+                    name="attachment"
+                    class="hidden"
+                    onchange="handleFileUpload(this, '{{ task.id }}')"
+                />
+            
+                <!-- Custom Upload Button -->
+                <button
+                    type="button"
+                    id="uploadButton_{{ task.id }}"
+                    onclick="document.getElementById('attachment_{{ task.id }}').click()"
+                    class="w-full text-left p-2 border border-gray-300 rounded-md shadow-sm text-lg text-gray-700  hover:bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                >
+                    คลิกเพื่ออัพโหลดไฟล์
+                </button>
                     {% if task.attachment %}
                       <!-- Show a download link for the current file -->
                       <p>
@@ -879,14 +916,6 @@
                     {% else %}
                       <p class="text-gray-500">No file attached</p>
                     {% endif %}
-                
-                    <!-- File input for uploading a new file -->
-                    <input
-                      type="file"
-                      id="attachment_{{ task.id }}"
-                      name="attachment"
-                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
                   </div>
                 </div>
                 
@@ -1009,12 +1038,14 @@
      function openProjectPopup() {
          document.getElementById('projectModal').classList.remove('hidden');
          document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
+         document.body.classList.add('overflow-hidden', 'h-screen'); // Disable scrolling
      }
 
      // Function to close the popup
      function closeProjectPopup() {
          document.getElementById('projectModal').classList.add('hidden');
          document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
+         document.body.classList.remove('overflow-hidden', 'h-screen'); // Disable scrolling
      }
  </script>
 
@@ -1024,12 +1055,15 @@
      function openProjectWorkPopup() {
          document.getElementById('projectModal-Popup').classList.remove('hidden');
          document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
+         document.body.classList.add('overflow-hidden', 'h-screen'); // Disable scrolling
+
      }
 
      // Function to close the popup
      function closeProjectWorkPopup() {
          document.getElementById('projectModal-Popup').classList.add('hidden');
          document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
+         document.body.classList.remove('overflow-hidden', 'h-screen'); // Enable scrolling
      }
  </script>
 
@@ -1039,12 +1073,16 @@
      function openAddPopupWork() {
          document.getElementById('WorkModal-Popup').classList.remove('hidden');
          document.getElementById('sidebar').classList.add('backdrop-blur'); // ทำให้ sidebar เบลอ
+         document.getElementById('sidebar').classList.add('overflow-hidden'); // ทำให้ sidebar เบลอ
+
+
      }
 
      // Function to close the popup
      function closeAddPopupWork() {
          document.getElementById('WorkModal-Popup').classList.add('hidden');
          document.getElementById('sidebar').classList.remove('backdrop-blur'); // เอาฟิลเตอร์เบลอออกจาก sidebar
+         document.body.classList.remove('overflow-hidden', 'h-screen'); // Enable scrolling
      }
  </script>
 
@@ -1138,7 +1176,9 @@
     // Function for "แก้ไข" button (add functionality as needed)
     function openeditWork(taskId) {
     // Show the specific edit modal
+
     const modal = document.getElementById(`EditWork-${taskId}`);
+
     if (modal) {
         modal.classList.remove('hidden');
     } else {
@@ -1150,6 +1190,8 @@ function closeeditWork(taskId) {
     const modal = document.getElementById(`EditWork-${taskId}`);
     if (modal) {
         modal.classList.add('hidden'); // Hide the modal
+        document.getElementById(`editPopuptwo${taskId}`).classList.add('hidden');
+
     } else {
         console.error(`Modal for Task ID ${taskId} not found.`);
     }
@@ -1170,12 +1212,28 @@ function closedeleteWork(taskId) {
     const modal = document.getElementById(`deleteWork-${taskId}`);
     if (modal) {
         modal.classList.add('hidden'); // Hide the modal
+        document.getElementById(`editPopuptwo${taskId}`).classList.add('hidden');
+
     } else {
         console.error(`Delete modal for Task ID ${taskId} not found.`);
     }
 }
+    function handleFileUpload(input, taskId) {
+        const uploadButton = document.getElementById(`uploadButton_${taskId}`);
+        const fileNameElement = document.getElementById(`fileName_${taskId}`);
 
+        if (input.files.length > 0) {
+            // Get the uploaded file name
+            const fileName = input.files[0].name;
 
+            // Replace the button text with the file name
+            uploadButton.textContent = fileName;
+
+            // Alternatively, you can display the file name below the button
+            // fileNameElement.textContent = `อัพโหลดไฟล์: ${fileName}`;
+            // fileNameElement.classList.remove('hidden');
+        }
+    }
     </script>
 
   <script>
@@ -1267,7 +1325,94 @@ function closedeleteWork(taskId) {
         }
       }
     </script>
+  <script>
+function toggleTaskStatus(taskId) {
+    const button = document.getElementById(`statusToggle_${taskId}`);
 
+    // Determine the current status and calculate the next status
+    let currentStatus = button.textContent.trim();
+    let newStatus;
+
+    if (currentStatus === 'เริ่มทำ') {
+        newStatus = 'in_progress';
+    } else if (currentStatus === 'กำลังดำเนินการ') {
+        newStatus = 'done';
+    } else if (currentStatus === 'เสร็จสิ้น') {
+        newStatus = 'to_do';
+    }
+
+    // Update the button's appearance and text
+    if (newStatus === 'to_do') {
+        button.textContent = 'เริ่มทำ';
+        button.classList.remove('text-blue-600', 'bg-blue-100', 'text-green-600', 'bg-green-100');
+        button.classList.add('text-gray-600', 'bg-gray-100');
+    } else if (newStatus === 'in_progress') {
+        button.textContent = 'กำลังดำเนินการ';
+        button.classList.remove('text-gray-600', 'bg-gray-100', 'text-green-600', 'bg-green-100');
+        button.classList.add('text-blue-600', 'bg-blue-100');
+    } else if (newStatus === 'done') {
+        button.textContent = 'เสร็จสิ้น';
+        button.classList.remove('text-gray-600', 'bg-gray-100', 'text-blue-600', 'bg-blue-100');
+        button.classList.add('text-green-600', 'bg-green-100');
+    }
+
+    // Send the updated status to the server and update the project progress
+    updateTaskStatus(taskId, newStatus);
+}
+
+function updateTaskStatus(taskId, status) {
+    fetch(`/update_task_status/${taskId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(), // Replace this with your CSRF token logic
+        },
+        body: JSON.stringify({ status: status }),
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to update task status');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the project progress bar in real time
+                updateProjectProgress(data.project_id);
+            }
+        })
+        .catch(error => {
+            console.error('Error updating task status:', error);
+        });
+}
+
+function updateProjectProgress(projectId) {
+    fetch(`/get_project_progress/${projectId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const progressCircle = document.querySelector('#projectProgressCircle');
+                const progressText = document.querySelector('#projectProgressText');
+
+                // Update the progress circle
+                progressCircle.style.strokeDasharray = `${data.completion_percentage}, 100`;
+
+                // Update the progress percentage text
+                progressText.textContent = `${data.completion_percentage}%`;
+            }
+        })
+        .catch(error => {
+            console.error('Error updating project progress:', error);
+        });
+}
+
+// Utility to get CSRF token
+function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+}
+
+  </script>
 
     {% endblock %}
 

@@ -13,6 +13,8 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
 import json
+from django.views.decorators.csrf import csrf_exempt  # Add this import
+
 
 def user_login(request):
     if request.method == 'POST':
@@ -625,3 +627,41 @@ def register_view(request):
     
     # If it's a GET request, you can return a template (if needed)
     return redirect('employee_list')
+
+def get_project_progress(request, project_id):
+    try:
+        project = Project.objects.annotate(
+            total_tasks=Count('tasks'),
+            completed_tasks=Count('tasks', filter=Q(tasks__status='done'))
+        ).get(pk=project_id)
+
+        # Calculate completion percentage
+        total_tasks = project.total_tasks or 1  # Avoid division by zero
+        completion_percentage = (project.completed_tasks / total_tasks) * 100
+
+        return JsonResponse({
+            'success': True,
+            'project_id': project.id,
+            'completion_percentage': round(completion_percentage, 2)
+        })
+    except Project.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Project not found'}, status=404)
+
+@csrf_exempt
+def update_task_status(request, task_id):
+    if request.method == 'POST':
+        print(f"Received Task ID: {task_id}")
+        try:
+            data = json.loads(request.body)
+            status = data.get('status')
+            print(f"New Status: {status}")
+            
+            task = Task.objects.get(id=task_id)
+            task.status = status
+            task.save()
+            return JsonResponse({'success': True, 'status': task.status, 'project_id': task.project_id})
+        except Task.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Task not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+    return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=400)

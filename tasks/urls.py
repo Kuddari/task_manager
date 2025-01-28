@@ -29,6 +29,9 @@ urlpatterns = [
     path('create_user/', create_user, name='create_user'),
     path('notifications/<int:pk>/read/', mark_notification_as_read, name='mark_notification_as_read'),
     path('employee_list', employee_list, name='employee_list'),
+    path('update_task_status/<int:task_id>/', update_task_status, name='update_task_status'),
+    path('get_project_progress/<int:project_id>/', get_project_progress, name='get_project_progress'),
+
 
 ]
 
