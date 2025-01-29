@@ -7,22 +7,22 @@
     <form method="POST" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="mb-4">
-        <label for="id_first_name" class="block text-sm font-medium">First Name</label>
+        <label for="id_first_name" class="block text-lg">First Name</label>
         {{ form.first_name }}
       </div>
 
       <div class="mb-4">
-        <label for="id_last_name" class="block text-sm font-medium">Last Name</label>
+        <label for="id_last_name" class="block text-lg">Last Name</label>
         {{ form.last_name }}
       </div>
 
       <div class="mb-4">
-        <label for="id_username" class="block text-sm font-medium">Username</label>
+        <label for="id_username" class="block text-lg">Username</label>
         {{ form.username }}
       </div>
 
       <div class="mb-4">
-        <label for="id_email" class="block text-sm font-medium">Email</label>
+        <label for="id_email" class="block text-lg">Email</label>
         {{ form.email }}
       </div>
 

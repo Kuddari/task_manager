@@ -53,18 +53,18 @@
                     <div class="flex flex-col gap-4">
                         {% for task in tasks %}
                         <!-- Task Item -->
-                        <div class="bg-black bg-opacity-65 backdrop-blur text-white p-4 rounded-lg flex items-center justify-between shadow-md transition-transform duration-300 hover:scale-105"
+                        <div class="bg-black bg-opacity-65 backdrop-blur hover:cursor-pointer text-white p-4 rounded-lg flex items-center justify-between shadow-md transition-transform duration-300 hover:scale-105"
                         onclick="showTaskDescriptionModal('{{ task.id }}')"
                         >
                             <!-- Task Details -->
                             <div class="flex flex-col">
-                                <span class="text-sm font-medium text-gray-400">Task</span>
+                                <span class="text-lg text-gray-400">Task</span>
                                 <span class="text-lg font-semibold">{{ task.title }}</span>
                             </div>
             
                             <!-- Due Date -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-400">Due Date</span>
+                                <span class="text-lg text-gray-400">Due Date</span>
                                 <span class="text-md font-semibold {% if task.is_overdue %} text-red-500 {% else %} text-slate-300 {% endif %}">
                                     {{ task.due_date|date:"d/m/Y"|default:"No Due Date" }}
                                 </span>
@@ -72,7 +72,7 @@
             
                             <!-- Task Priority -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-400">Priority</span>
+                                <span class="text-lg text-gray-400">Priority</span>
                                 <span class="text-md font-semibold">
                                     {% if task.priority == 'High' %}
                                     <span class="text-red-500">High</span>
@@ -87,7 +87,7 @@
 
                            <!-- Task Status -->
                             <div class="flex flex-col items-center">
-                                <span class="text-sm font-medium text-gray-400">Status</span>
+                                <span class="text-lg text-gray-400">Status</span>
                                 <div class="flex space-x-2 mt-1"
                                 onclick="event.stopPropagation()"
                                 >
@@ -187,7 +187,7 @@
                        
                        <!-- First Name -->
                        <div class="flex flex-col">
-                           <label for="name" class="block text-sm font-medium text-black">ชื่อโครงการ</label>
+                           <label for="name" class="block text-lg text-black">ชื่อโครงการ</label>
                            <div class="mt-1">
                                <input type="text" id="name"  class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                            </div>
@@ -196,7 +196,7 @@
                    
                        <!-- Description -->
                        <div class="flex flex-col">
-                           <label for="description" class="block text-sm font-medium text-black">ใส่รายละเอียด</label>
+                           <label for="description" class="block text-lg text-black">ใส่รายละเอียด</label>
                            <div class="mt-1">
                                <textarea id="description" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" rows="2"></textarea>
                            </div>
@@ -205,7 +205,7 @@
                    
                        <!-- Members -->
                        <div class="flex flex-col">
-                           <label for="members" class="block text-sm font-medium text-black">ชื่อสมาชิก</label>
+                           <label for="members" class="block text-lg text-black">ชื่อสมาชิก</label>
                            <div class="mt-1">
                                <select id="members" name="members" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                                    <option value="" disabled selected>เลือกสมาชิก</option>  <!-- ตัวเลือกเริ่มต้น -->
@@ -216,7 +216,7 @@
                    
                       <!-- Start Date -->
                        <div class="flex flex-col">
-                           <label for="start_date" class="block text-sm font-medium text-black">วันที่เริ่มต้น</label>
+                           <label for="start_date" class="block text-lg text-black">วันที่เริ่มต้น</label>
                            <div class="mt-1">
                                <input type="text" id="start_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                            </div>
@@ -224,13 +224,13 @@
    
                        <!-- End Date -->
                        <div class="flex flex-col">
-                           <label for="end_date" class="block text-sm font-medium text-black">วันที่สิ้นสุด</label>
+                           <label for="end_date" class="block text-lg text-black">วันที่สิ้นสุด</label>
                            <div class="mt-1">
                                <input type="text" id="end_date" placeholder="dd/mm/yyyy" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
                            </div>
                        </div>
                        <div class="flex flex-col">
-                           <label class="block text-sm font-medium text-black">สถานะ</label>
+                           <label class="block text-lg text-black">สถานะ</label>
                            <div class="mt-1 flex space-x-4">
                                <!-- กำลังทำงาน -->
                                <span id="working" class="cursor-pointer px-4 py-2 rounded-lg border border-gray-300 text-sm text-black hover:bg-gray-100">
@@ -331,12 +331,12 @@
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <!-- Modal Header -->
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold text-gray-800">ยืนยันการส่งงาน</h2>
+                <h2 class="text-xl text-gray-800">ยืนยันการส่งงาน</h2>
                 <button 
                     onclick="hideConfirmationModal()" 
-                    class="text-gray-400 hover:text-gray-600 text-xl font-bold focus:outline-none"
+                    class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-md text-white transition hover:scale-105"
                 >
-                    &times;
+                    X
                 </button>
             </div>
 
@@ -344,7 +344,7 @@
             <form id="submissionForm" class="space-y-4">
                 <!-- File Upload -->
                 <div>
-                    <label for="fileUpload" class="block text-sm font-medium text-gray-700">แนบไฟล์</label>
+                    <label for="fileUpload" class="block text-lg text-gray-700">แนบไฟล์</label>
                     <input 
                         type="file" 
                         id="fileUpload" 
@@ -355,7 +355,7 @@
 
                 <!-- URL Input -->
                 <div>
-                    <label for="urlInput" class="block text-sm font-medium text-gray-700">เพิ่ม URL</label>
+                    <label for="urlInput" class="block text-lg text-gray-700">เพิ่ม URL</label>
                     <input 
                         type="url" 
                         id="urlInput" 
@@ -367,7 +367,7 @@
 
                 <!-- Details Textarea -->
                 <div>
-                    <label for="detailsInput" class="block text-sm font-medium text-gray-700">รายละเอียด</label>
+                    <label for="detailsInput" class="block text-lg text-gray-700">รายละเอียด</label>
                     <textarea 
                         id="detailsInput" 
                         name="detailsInput" 
@@ -379,17 +379,11 @@
 
                 <!-- Modal Actions -->
                 <div class="flex justify-end space-x-3">
-                    <button 
-                        type="button" 
-                        onclick="hideConfirmationModal()" 
-                        class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm"
-                    >
-                        ยกเลิก
-                    </button>
+                    
                     <button 
                         type="button" 
                         onclick="submitConfirmation()" 
-                        class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+                        class="bg-blue-500 hover:bg-blue-600 transition hover:scale-105 text-white px-4 py-2 rounded-lg text-sm"
                     >
                         ยืนยัน
                     </button>
@@ -403,7 +397,14 @@
         <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
 
             <!-- Modal Header -->
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">รายละเอียดงาน</h2>
+            <div class="flex justify-between mb-2">
+                <h2 class="text-xl text-gray-800">รายละเอียดงาน</h2>
+                <button 
+                onclick="hideTaskDescriptionModal()" 
+                class="bg-red-500 hover:bg-red-600 py-1 px-2  rounded-md text-white transition hover:scale-105">
+                X
+            </button>
+            </div>
 
             <!-- Task Details Content -->
             <div id="taskDescriptionContent">
@@ -414,19 +415,11 @@
             <div class="flex justify-end mt-4 space-x-2">
                 
 
-                <!-- Cancel Button -->
-                <button 
-                    id="cancelButton"
-                    class="bg-gray-500 text-white text-sm px-4 py-2 rounded-md"
-                    onclick="hideTaskDescriptionModal()"
-                >
-                    ยกเลิก
-                </button>
 
                 <!-- Update Status to "In Progress" -->
                 <button 
                     id="updateStatusButton"
-                    class="bg-blue-500 text-white text-sm px-4 py-2 rounded-md"
+                    class="bg-blue-500 hover:bg-blue-600 transition hover:scale-105 text-white text-lg px-4 py-2 rounded-md"
                     onclick="updateStatus(window.currentTaskId, 'in_progress')"
                 >
                     กำลังจะทำ
@@ -438,18 +431,20 @@
 
 
     <div id="taskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50" >
-        <div class="bg-white rounded-lg shadow-lg p-6 w-96 relative">
-            <!-- Close Button -->
-            <button 
+        <div class="bg-white rounded-lg shadow-lg drop-shadow-lg p-6 w-96 relative">
+            <!-- Close Button --> 
+            <div class="flex justify-between mb-2">
+                <h2 class="text-xl text-gray-800">ตรวจสอบงาน</h2>
+                <button 
                 onclick="hideTaskDetailsModal()" 
-                class="absolute top-6 left-80 text-red-500 text-xl font-bold focus:outline-none hover:text-red-700"
-            >
-                &times;
+                class="bg-red-500 hover:bg-red-600 py-1 px-2  rounded-md text-white transition hover:scale-105">
+                X
             </button>
+            </div>
 
     
             <!-- Modal Header -->
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">ตรวจสอบงาน</h2>
+           
     
             <!-- Task Details Content -->
             <div id="taskDetailsContent">
@@ -457,20 +452,20 @@
             </div>
     
             <!-- Modal Actions -->
-            <div class="flex justify-end mt-4 space-x-2">
+            <div class="flex justify-end mt-4 space-x-4">
 
                 <!-- Edit Button -->
                 <button 
                     id="editButton"
-                    class="bg-yellow-500 text-white text-sm px-4 py-2 rounded-md"
-                    onclick="editTask()"
+                    class="bg-yellow-500 hover:bg-yellow-600 transition hover:scale-105 text-white text-lg px-4 py-1 rounded-md"
+                    onclick="openeditTask()"
                 >
                     ต้องแก้
                 </button>
                 <!-- Approve Button -->
                 <button 
                     id="approveButton"
-                    class="bg-green-500 text-white text-sm px-4 py-2 rounded-md"
+                    class="bg-green-500 hover:bg-green-600 transition hover:scale-105 text-white text-lg px-4 py-1 rounded-md"
                     onclick="approveTask()"
                 >
                     ผ่าน
@@ -478,8 +473,33 @@
     
                 
             </div>
+
+            <div id="EdittaskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50" >
+                <div class="bg-white rounded-lg shadow-lg drop-shadow-md p-6 w-80 relative">
+                    <div class="text-right">
+                        <button type="button" onclick="closeeditTask()" class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-md text-white transition hover:scale-105" type="button">X</button>
+                    </div>
+                    <div class="flex flex-col">
+                        <label class="text-lg mb-1" for="Detail">รายละเอียดที่ต้องแก้ไข</label>
+                        <textarea class="w-full border-gray-400 rounded-lg text-gray-500" name="3" id=""></textarea> 
+                    </div>
+                    <div class="text-center mt-4">
+                        <button type="button" onclick="ConfirmeditTask()" class="bg-green-500 hover:bg-green-600 py-1 px-3 text-white text-lg rounded-lg drop-shadow-md shadow-md transition hover:scale-105" >ยืนยัน</button>  
+                    </div>                            
+                </div>
         </div>
     </div>
+
+    <script>
+        function openeditTask() {
+        document.getElementById('EdittaskDetailsModal').classList.remove('hidden');
+    }
+
+    function closeeditTask{{project.id}}() {
+        document.getElementById('EdittaskDetailsModal').classList.add('hidden');
+
+    }
+    </script>
     
 
     <script>
@@ -675,19 +695,19 @@
             const taskDescriptionContent = document.getElementById('taskDescriptionContent');
             taskDescriptionContent.innerHTML = `
                 <div class="mb-4">
-                    <p class="text-sm font-medium text-gray-700">งาน:</p>
+                    <p class="text-lg text-gray-700">งาน:</p>
                     <p class="text-gray-800 font-semibold">${data.title}</p>
                 </div>
                 <div class="mb-4">
-                    <p class="text-sm font-medium text-gray-700">รายละเอียด:</p>
-                    <p class="text-gray-800">${data.description || 'ไม่มีรายละเอียด'}</p>
+                    <p class="text-lg  text-gray-700">รายละเอียด:</p>
+                    <p class="text-gray-800 break-words">${data.description || 'ไม่มีรายละเอียด'}</p>
                 </div>
                 <div class="mb-4">
-                    <p class="text-sm font-medium text-gray-700">สร้างโดย:</p>
+                    <p class="text-lg text-gray-700">สร้างโดย:</p>
                     <p class="text-gray-800">${data.created_by}</p>
                 </div>
                 <div class="mb-4">
-                    <p class="text-sm font-medium text-gray-700">ไฟล์ที่แนบ:</p>
+                    <p class="text-lg text-gray-700">ไฟล์ที่แนบ:</p>
                     ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
                 </div>
             `;
@@ -727,15 +747,15 @@ function hideTaskDescriptionModal() {
                         const taskDetailsContent = document.getElementById('taskDetailsContent');
                         taskDetailsContent.innerHTML = `
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-700">ไฟล์ที่ส่ง:</p>
+                                <p class="text-lg  text-gray-700">ไฟล์ที่ส่ง:</p>
                                 ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
                             </div>
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-700">URL:</p>
+                                <p class="text-lg  text-gray-700">URL:</p>
                                 ${data.url ? `<a href="${data.url}" target="_blank" class="text-blue-500 underline">${data.url}</a>` : '<p class="text-gray-400">ไม่มี URL</p>'}
                             </div>
                             <div class="mb-4">
-                                <p class="text-sm font-medium text-gray-700">รายละเอียด:</p>
+                                <p class="text-lg text-gray-700 break-words">รายละเอียด:</p>
                                 <p class="text-gray-800">${data.details || 'ไม่มีรายละเอียด'}</p>
                             </div>
                         `;
@@ -792,7 +812,7 @@ function hideTaskDescriptionModal() {
             }
 
 
-            function editTask() {
+            function ConfirmeditTask() {
                 console.log("Editing task with Task ID:", window.currentTaskId); // Log taskId being edited
 
                 if (!window.currentTaskId) {
