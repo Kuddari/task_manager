@@ -16,7 +16,6 @@ urlpatterns = [
     path('project_list/edit/<int:project_id>/', edit_project, name='edit_project'),
     path('delete_project/<int:project_id>/', delete_project, name='delete_project'),
     path('project_list/add-work/<int:pk>/', add_task, name='add_task'),
-
     path('project', tasks_list, name='project'),
     path('update-task-status/', update_task_status, name='update-task-status'),
     path('update-task-check-status/', update_task_check_status, name='update_task_check_status'),
@@ -30,6 +29,8 @@ urlpatterns = [
     path('create_user/', create_user, name='create_user'),
     path('notifications/<int:pk>/read/', mark_notification_as_read, name='mark_notification_as_read'),
     path('employee_list', employee_list, name='employee_list'),
+    path('edit-employee/', edit_employee, name='edit_employee'),
+    path('delete-employee/', delete_employee, name='delete_employee'),
     path('update_task_status/<int:task_id>/', update_task_status, name='update_task_status'),
     path('get_project_progress/<int:project_id>/', get_project_progress, name='get_project_progress'),
 

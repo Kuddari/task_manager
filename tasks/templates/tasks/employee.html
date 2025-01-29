@@ -79,15 +79,28 @@
 
                 <div class="flex flex-row gap-4 mt-4 text-xl">
                     <!-- Edit button -->
-                    <button onclick="openEditEmployee()"
-                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">
+                    <button onclick="openEditPopupEmployee(
+                        '{{ employee.id }}',
+                        '{{ employee.username }}',
+                        '{{ employee.first_name|escapejs }}',
+                        '{{ employee.last_name|escapejs }}',
+                        '{{ employee.position|escapejs }}',
+                        '{{ employee.faculty|escapejs }}',
+                        '{{ employee.major|escapejs }}'
+                    )"
+                    class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">
                         แก้ไขข้อมูล
                     </button>
+
+
+
                     <!-- Delete button -->
-                    <button onclick="opendeleteEmployee()"
-                            class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">
-                        ลบบุคลากร
+                    <!-- Delete button -->
+                    <button onclick="openDeleteEmployee({{ employee.id }})"
+                    class="bg-gray-300 hover:bg-gray-400 py-2 rounded-lg text-black w-full">
+                    ลบบุคลากร
                     </button>
+
                 </div>
             </div>
         {% endfor %}
@@ -227,63 +240,115 @@
       </div>
       
       <!-- Edit and Delete Popups (Similar changes if needed) -->
-      
-      <!-- แก้ไขบุคลากร -->
-      <div id="EditEmployee" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
-        <!-- Similar changes for editing user fields here -->
-        <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl">
-          <div class="flex justify-between">
-            <h3 class="text-lg font-semibold">แก้ไขข้อมูลบุคลากร</h3>
-            <button
-              onclick="closeEditEmployee()"
-              class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg"
-            >
+    
+<!-- Edit Employee Modal -->
+<div id="EditEmployee-Popup" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+  <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-11/12 max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div class="flex justify-between">
+          <h3 class="text-lg font-semibold">แก้ไขบุคลากร</h3>
+          <button onclick="closeEditPopupEmployee()" 
+                  class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">
               X
-            </button>
-          </div>
-          <form method="POST" enctype="multipart/form-data" class="space-y-6">
-            {% csrf_token %}
-            <!-- Add the corresponding fields: first_name, last_name, position, etc. -->
-            <!-- ... -->
-            <div class="flex justify-end">
-              <button
-                type="submit"
-                class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out"
-              >
-                ยืนยันแก้ไขข้อมูล
-              </button>
-            </div>
-          </form>
-        </div>
+          </button>
       </div>
 
-      <!-- ลบบุคลากร -->
-      <div id="deleteEmployee" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
-        <!-- Confirm Delete Form -->
-        <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80">
-          <div class="text-center">
-            <h3 class="text-lg">ยืนยันที่จะลบบุคลากร</h3>
+      <!-- Update Employee Form -->
+      <form method="POST" action="{% url 'edit_employee' %}" enctype="multipart/form-data" class="space-y-6">
+          {% csrf_token %}
+          <input type="hidden" id="edit_employee_id" name="employee_id">
+          
+          <div class="flex flex-col">
+              <label for="edit_username" class="block text-lg text-black">ชื่อผู้ใช้</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_username" name="username" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+              </div>
           </div>
-          <form method="POST" class="space-y-6">
-            {% csrf_token %}
-            <div class="flex justify-center gap-4">
-              <button
-                type="submit"
-                class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg"
-              >
-                ยืนยัน
-              </button>
-              <button
-                type="button"
-                onclick="closedeleteEmployee()"
-                class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg"
-              >
-                ยกเลิก
-              </button>
+
+          <!-- Password (Leave blank to keep unchanged) -->
+          <div class="flex flex-col">
+              <label for="edit_password" class="block text-lg text-black">รหัสผ่าน (ปล่อยว่างไว้หากไม่ต้องการเปลี่ยน)</label>
+              <div class="mt-1">
+                  <input type="password" id="edit_password" name="password" placeholder="••••••••"
+                      class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+
+          <!-- First Name -->
+          <div class="flex flex-col">
+              <label for="edit_first_name" class="block text-lg text-black">ชื่อ</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_first_name" name="first_name" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+
+          <!-- Last Name -->
+          <div class="flex flex-col">
+              <label for="edit_last_name" class="block text-lg text-black">นามสกุล</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_last_name" name="last_name" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+
+          <!-- Position -->
+          <div class="flex flex-col">
+              <label for="edit_position" class="block text-lg text-black">ตำแหน่ง</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_position" name="position" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+
+          <!-- Faculty -->
+          <div class="flex flex-col">
+              <label for="edit_faculty" class="block text-lg text-black">คณะ</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_faculty" name="faculty" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+
+          <!-- Major -->
+          <div class="flex flex-col">
+              <label for="edit_major" class="block text-lg text-black">สาขา</label>
+              <div class="mt-1">
+                  <input type="text" id="edit_major" name="major" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+              </div>
+          </div>
+          
+          <!-- Profile Picture (Only Update) -->
+          <div class="flex flex-col">
+            <label for="edit_profile_picture" class="block text-lg text-black">อัปโหลดรูปภาพใหม่ (ไม่จำเป็น)</label>
+            <div class="mt-1">
+                <input type="file" id="edit_profile_picture" name="profile_picture" class="block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
             </div>
-          </form>
         </div>
+
+          <!-- Submit Button -->
+          <div class="flex justify-end">
+              <button type="submit" class="hover:scale-105 transition-all duration-400 py-2 px-6 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-200 ease-in-out">
+                  ยืนยันแก้ไขข้อมูล
+              </button>
+          </div>
+      </form>
+  </div>
+</div>
+
+<!-- ลบบุคลากร -->
+<div id="deleteEmployeeModal" class="hidden z-50 fixed inset-0 bg-gray-500 bg-opacity-25 flex justify-center items-center backdrop-blur">
+  <div class="bg-white opacity-85 backdrop-blur p-6 rounded-lg shadow-lg w-80">
+      <div class="text-center">
+          <h3 class="text-lg">ยืนยันที่จะลบบุคลากร</h3>
       </div>
+      <div class="flex justify-center gap-4">
+          <button id="confirmDeleteButton" class="hover:scale-105 transition-all duration-400 hover:bg-green-700 px-4 py-2 bg-green-500 text-white rounded-lg">
+              ยืนยัน
+          </button>
+          <button onclick="closeDeleteEmployee()" class="hover:scale-105 transition-all duration-400 hover:bg-red-700 px-4 py-2 bg-red-500 text-white rounded-lg">
+              ยกเลิก
+          </button>
+      </div>
+  </div>
+</div>
+
+      
     </div>
   </div>
   
@@ -294,27 +359,84 @@
       document.getElementById('WorkModal-Popup').classList.remove('hidden');
       document.getElementById('sidebar').classList.add('backdrop-blur'); 
     }
+
     function closeAddPopupEmployee() {
       document.getElementById('WorkModal-Popup').classList.add('hidden');
       document.getElementById('sidebar').classList.remove('backdrop-blur'); 
     }
 
-    // Edit Employee
-    function openEditEmployee() {
-      document.getElementById('EditEmployee').classList.remove('hidden');
-    }
-    function closeEditEmployee() {
-      document.getElementById('EditEmployee').classList.add('hidden');
-    }
-
-    // Delete Employee
-    function opendeleteEmployee() {
-      document.getElementById('deleteEmployee').classList.remove('hidden');
-    }
-    function closedeleteEmployee() {
-      document.getElementById('deleteEmployee').classList.add('hidden');
-    }
+  
   </script>
+
+<script>
+  function openEditPopupEmployee(id, username, firstName, lastName, position, faculty, major) {
+      console.log("Opening Edit Modal for Employee:", id);
+      let modal = document.getElementById('EditEmployee-Popup');
+
+      if (!modal) {
+          console.error("Modal not found in the DOM.");
+          return;
+      }
+
+      document.getElementById('edit_employee_id').value = id || "";
+      document.getElementById('edit_username').value = username || "";
+      document.getElementById('edit_first_name').value = firstName || "";
+      document.getElementById('edit_last_name').value = lastName || "";
+      document.getElementById('edit_position').value = position || "";
+      document.getElementById('edit_faculty').value = faculty || "";
+      document.getElementById('edit_major').value = major || "";
+
+      modal.classList.remove('hidden');
+      console.log("Edit modal should now be visible.");
+  }
+
+  function closeEditPopupEmployee() {
+      document.getElementById('EditEmployee-Popup').classList.add('hidden');
+      console.log("Edit modal closed.");
+  }
+
+
+  let selectedEmployeeId = null;
+
+  function openDeleteEmployee(employeeId) {
+      selectedEmployeeId = employeeId;  // Store employee ID
+      document.getElementById('deleteEmployeeModal').classList.remove('hidden');
+  }
+
+  function closeDeleteEmployee() {
+      document.getElementById('deleteEmployeeModal').classList.add('hidden');
+  }
+
+  document.getElementById('confirmDeleteButton').addEventListener('click', function() {
+      if (!selectedEmployeeId) {
+          alert('Employee ID is missing.');
+          return;
+      }
+
+      fetch('/delete-employee/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({ employee_id: selectedEmployeeId })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              location.reload();  // Reload the page after successful deletion
+          } else {
+              alert('Error: ' + data.error);
+          }
+      })
+      .catch(error => console.error('Error:', error));
+
+      closeDeleteEmployee();
+  });
+
+
+</script>
+
 {% endblock %}
 </body>
 </html>

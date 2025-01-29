@@ -26,6 +26,55 @@
             <div class="mt-3 text-xl">
                 <button onclick="openProjectPopup()" class="bg-blue-500 px-4 py-2 rounded-lg text-white">เพิ่มโครงการใหม่</button>
             </div>
+
+
+             <!-- Circular Progress Bar -->
+             <div class="flex items-center justify-center w-[90px] h-[90px] mr-12">
+              <svg class="w-full h-full" viewBox="0 0 36 36">
+                  <!-- Background Circle -->
+                  <circle
+                      class="fill-none stroke-gray-300"
+                      cx="18"
+                      cy="18"
+                      r="15.91549431"
+                      stroke-width="3.8"
+                      transform="rotate(-90 18 18)"
+                  ></circle>
+          
+                  <!-- Progress Circle -->
+                  <circle
+                      id="taskProgressCircle"
+                      class="fill-none stroke-green-500 transition-[stroke-dasharray] duration-600 ease-in-out"
+                      cx="18"
+                      cy="18"
+                      r="15.91549431"
+                      style="stroke-dasharray: {{ overall_completion_percentage }}, 100"
+                      stroke-width="3.8"
+                      stroke-linecap="round"
+                      transform="rotate(-90 18 18)"
+                  ></circle>
+          
+                  <!-- Background for Text -->
+                  <circle
+                      class="fill-white"
+                      cx="18"
+                      cy="18"
+                      r="14.2"
+                  ></circle>
+          
+                  <!-- Percentage Text -->
+                  <text
+                      id="taskProgressText"
+                      class="fill-green-500 font-bold text-[0.5em]"
+                      x="18"
+                      y="18"
+                      text-anchor="middle"
+                      dominant-baseline="central"
+                  >
+                      {{ overall_completion_percentage|floatformat:0 }}%
+                  </text>
+              </svg>
+          </div>
         </div>
 
         <!-- Container for all project cards -->

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.contrib import messages
 from .models import *
 from .forms import *
@@ -231,6 +232,14 @@ def project_list(request):
         completed_tasks=Count('tasks', filter=Q(tasks__status='done')),
     )
 
+    # Calculate combined total and completed tasks across all projects
+    total_tasks_all = sum(project.total_tasks for project in projects)
+    completed_tasks_all = sum(project.completed_tasks for project in projects)
+
+    # Calculate overall completion percentage
+    overall_completion_percentage = (
+        (completed_tasks_all / total_tasks_all * 100) if total_tasks_all > 0 else 0
+    )
     # Add completion percentage for each project
     for project in projects:
         project.completion_percentage = (
@@ -245,10 +254,12 @@ def project_list(request):
         for project in projects
     }
 
+
     return render(request, 'tasks/project_lists.html', {
         'projects': projects,
         'members': members,
         'project_members': project_members,  # Pass project member data
+        'overall_completion_percentage': overall_completion_percentage,  # Pass the completion percentage
     })
 
 def project_detail(request, pk):
@@ -501,6 +512,68 @@ def employee_list(request):
     # Pass the user list to the template
     return render(request, 'tasks/employee.html', {'employees': employees})
 
+@login_required
+def edit_employee(request):
+    if request.method == 'POST':
+        employee_id = request.POST.get('employee_id')
+
+        # Check if employee_id exists
+        if not employee_id:
+            return JsonResponse({'error': 'Employee ID is missing'}, status=400)
+
+        # Retrieve employee safely
+        employee = get_object_or_404(User, id=employee_id)
+
+        # Update employee fields
+        employee.username = request.POST.get('username', employee.username)
+        employee.first_name = request.POST.get('first_name', employee.first_name)
+        employee.last_name = request.POST.get('last_name', employee.last_name)
+        employee.position = request.POST.get('position', employee.position)
+        employee.faculty = request.POST.get('faculty', employee.faculty)
+        employee.major = request.POST.get('major', employee.major)
+        
+        # Handle profile picture update
+        if 'profile_picture' in request.FILES:
+            # Delete old profile picture if exists
+            if employee.profile_picture:
+                default_storage.delete(employee.profile_picture.path)
+
+            # Save new profile picture
+            employee.profile_picture = request.FILES['profile_picture']
+
+        # Update password only if provided
+        password = request.POST.get('password')
+        if password:
+            employee.set_password(password)
+
+        # Save changes
+        employee.save()
+
+        return redirect(employee_list)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def delete_employee(request):
+    """
+    View to delete an employee using AJAX.
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)  # Get JSON data from request
+            employee_id = data.get('employee_id')
+
+            if not employee_id:
+                return JsonResponse({'error': 'Employee ID is missing'}, status=400)
+
+            employee = get_object_or_404(User, id=employee_id)
+            employee.delete()
+            return JsonResponse({'success': True, 'message': 'Employee deleted successfully'})
+
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+    return JsonResponse({'error': 'Invalid request method'}, status=400)
+
 def tasks_list(request):
     tasks = Task.objects.all()
     overdue_filter = request.GET.get('overdue')  # Get the 'overdue' query parameter
@@ -542,12 +615,15 @@ def update_task_status(request):
             logger.debug('Received data: %s', data)  # Log incoming data
             task_id = data.get('task_id')
             status = data.get('status')
+            new_description = data.get('description', '').strip()  # Get new description if provided
 
             if not task_id or not status:
                 return JsonResponse({'success': False, 'error': 'Missing task_id or status'})
 
             task = Task.objects.get(id=task_id)
             task.status = status
+            if new_description:
+                task.description = new_description
             task.save()
 
             return JsonResponse({'success': True})
@@ -612,6 +688,7 @@ def get_task_details(request, task_id):
             'details': task.details,
             'description': task.description,
             'created_by': task.created_by.get_full_name() if task.created_by else "Unknown",
+            'status': task.status,
         }
         return JsonResponse(data)
     except Task.DoesNotExist:
