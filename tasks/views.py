@@ -14,7 +14,7 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count, Q
 import json
-from django.views.decorators.csrf import csrf_exempt  # Add this import
+from django.views.decorators.csrf import csrf_exempt, csrf_protect  # Add this import
 import logging
 
 logger = logging.getLogger(__name__)
@@ -607,6 +607,32 @@ def tasks_list(request):
         'counts': counts,
     })
 
+@csrf_protect
+def to_edit_task(request):
+    if request.method == 'POST':
+        task_id = request.POST.get('task_id')
+        new_description = request.POST.get('description', None)
+
+        print(f"✅ Received Task Update Request")
+        print(f"   🔹 Task ID: {task_id}")
+        print(f"   🔹 New Description: {new_description}")
+
+        if not task_id:
+            return JsonResponse({'success': False, 'error': 'Task ID is missing'})
+
+        task = get_object_or_404(Task, id=task_id)
+        task.status = 'to_do'  # Set status to 'To-Do'
+
+        if new_description is not None:
+            task.description = new_description  # Update description if provided
+
+        task.save()
+        print(f"✅ Task {task_id} successfully updated to 'To-Do' with new description")
+
+        return redirect('project')  # Redirect to project page
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
 @csrf_exempt
 def update_task_status(request):
     if request.method == 'POST':
@@ -615,16 +641,28 @@ def update_task_status(request):
             logger.debug('Received data: %s', data)  # Log incoming data
             task_id = data.get('task_id')
             status = data.get('status')
-            new_description = data.get('description', '').strip()  # Get new description if provided
+            new_description = data.get('description', None)  # Get description, None if missing
+
+            print("Received data in update_task_status:")
+            print("Task ID:", task_id)
+            print("New Status:", status)
+            print("New Description:", new_description)
 
             if not task_id or not status:
                 return JsonResponse({'success': False, 'error': 'Missing task_id or status'})
 
             task = Task.objects.get(id=task_id)
             task.status = status
-            if new_description:
+            if new_description is not None:
+                task.description = ''  # Clear existing description
                 task.description = new_description
+
+                print("Description updated to:", task.description)
+            else:
+                print("No new description provided.")
+
             task.save()
+            print("Task updated successfully.")
 
             return JsonResponse({'success': True})
         except Task.DoesNotExist:

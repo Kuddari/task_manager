@@ -18,6 +18,7 @@ urlpatterns = [
     path('project_list/add-work/<int:pk>/', add_task, name='add_task'),
     path('project', tasks_list, name='project'),
     path('update-task-status/', update_task_status, name='update-task-status'),
+    path('to_edit_task', to_edit_task, name='to_edit_task'),
     path('update-task-check-status/', update_task_check_status, name='update_task_check_status'),
     path('submit-task/', submit_task, name='submit-task'),
     path('get-task-details/<int:task_id>/', get_task_details, name='get_task_details'),

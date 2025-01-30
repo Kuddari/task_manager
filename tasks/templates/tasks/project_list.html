@@ -436,10 +436,10 @@
             <div class="flex justify-between mb-2">
                 <h2 class="text-xl text-gray-800">ตรวจสอบงาน</h2>
                 <button 
-                onclick="hideTaskDetailsModal()" 
-                class="bg-red-500 hover:bg-red-600 py-1 px-2  rounded-md text-white transition hover:scale-105">
-                X
-            </button>
+                    onclick="hideTaskDetailsModal()" 
+                    class="bg-red-500 hover:bg-red-600 py-1 px-2  rounded-md text-white transition hover:scale-105">
+                    X
+                </button>
             </div>
 
     
@@ -456,9 +456,8 @@
 
                 <!-- Edit Button -->
                 <button 
-                    id="editButton"
                     class="bg-yellow-500 hover:bg-yellow-600 transition hover:scale-105 text-white text-lg px-4 py-1 rounded-md"
-                    onclick="openeditTask()"
+                    onclick="openeditTask(window.currentTaskId)"
                 >
                     ต้องแก้
                 </button>
@@ -474,25 +473,39 @@
                 
             </div>
 
-            <div id="EdittaskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50" >
-                <div class="bg-white rounded-lg shadow-lg drop-shadow-md p-6 w-80 relative">
-                    <div class="text-right">
-                        <button type="button" onclick="closeeditTask()" class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-md text-white transition hover:scale-105" type="button">X</button>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-lg mb-1" for="editDescription">รายละเอียด</label>
-                        <textarea id="editDescription" class="w-full border-gray-400 rounded-lg text-gray-500" placeholder="ระบุรายละเอียดที่ต้องแก้ไข..."></textarea>
-                    </div>
-                    <div class="text-center mt-4">
-                        <button type="button" onclick="ConfirmeditTask()" class="bg-green-500 hover:bg-green-600 py-1 px-3 text-white text-lg rounded-lg drop-shadow-md shadow-md transition hover:scale-105" >ยืนยัน</button>  
-                    </div>                            
+           <!-- Edit Task Modal -->
+        <!-- Edit Task Modal -->
+    <div id="EdittaskDetailsModal" class="hidden fixed inset-0 bg-white bg-opacity-50 backdrop-blur flex justify-center items-center z-50">
+        <div class="bg-white rounded-lg shadow-lg drop-shadow-md p-6 w-80 relative">
+            <div class="text-right">
+                <button type="button" onclick="closeeditTask()" class="bg-red-500 hover:bg-red-600 px-2 py-1 rounded-md text-white transition hover:scale-105">X</button>
+            </div>
+
+            <form id="editTaskForm" method="POST" action="{% url 'to_edit_task' %}">
+                {% csrf_token %}
+                <input type="hidden" id="editTaskId" name="task_id">
+                
+                <div class="flex flex-col">
+                    <label class="text-lg mb-1" for="editDescription">รายละเอียดที่ต้องแก้ไข</label>
+                    <textarea id="editDescription" name="description" class="w-full border-gray-400 rounded-lg text-gray-500" placeholder="ระบุรายละเอียดที่ต้องแก้ไข..."></textarea>
                 </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="bg-green-500 hover:bg-green-600 py-1 px-3 text-white text-lg rounded-lg drop-shadow-md shadow-md transition hover:scale-105">ยืนยัน</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script>
         // Open the Edit Task Modal
-        function openeditTask() {
+        
+      
+        function openeditTask(taskId) {
+            console.log("Opening edit modal for Task ID:", taskId);  // Debugging log
+
+            document.getElementById('editTaskId').value = taskId;  // Set Task ID
+            document.getElementById('editDescription').value = '';  // Clear old input
             document.getElementById('EdittaskDetailsModal').classList.remove('hidden');
         }
 
@@ -501,41 +514,6 @@
             document.getElementById('EdittaskDetailsModal').classList.add('hidden');
         }
 
-        // Confirm Edit Task (Update Status & Description)
-        function ConfirmeditTask() {
-            const editDescription = document.getElementById('editDescription').value.trim(); // Get description input
-            console.log("Updating task:", window.currentTaskId, "with new description:", editDescription);
-
-            if (!window.currentTaskId) {
-                alert("Task ID is missing.");
-                return;
-            }
-
-            fetch('/update-task-status/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}', // Ensure CSRF token is included
-                },
-                body: JSON.stringify({ 
-                    task_id: window.currentTaskId, 
-                    status: 'to_do',
-                    description: editDescription // Send new description
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log("Task moved to 'To-Do' and updated with new description.");
-                    location.reload(); // Reload the page to reflect changes
-                } else {
-                    console.error("Error updating task:", data.error);
-                }
-            })
-            .catch(error => console.error("Error:", error));
-
-            closeeditTask(); // Close the modal after submission
-        }
 
     </script>
     
@@ -562,9 +540,6 @@
 
             window.location.search = queryParams.toString(); // Refresh the page with the updated filter
         }
-
-        
-        
 
     </script>
 
@@ -724,68 +699,68 @@
         }
 
         function showTaskDescriptionModal(taskId) {
-    console.log("Opening task description modal for Task ID:", taskId);
-    window.currentTaskId = taskId; // Store task ID globally
+            console.log("Opening task description modal for Task ID:", taskId);
+            window.currentTaskId = taskId; // Store task ID globally
 
-    fetch(`/get-task-details/${taskId}/`)
-        .then(response => response.json())
-        .then(data => {
-            const taskDescriptionContent = document.getElementById('taskDescriptionContent');
-            
-            // Base Task Details
-            let modalContent = `
-                <div class="mb-4">
-                    <p class="text-lg text-gray-700">งาน:</p>
-                    <p class="text-gray-800 font-semibold">${data.title}</p>
-                </div>
-                <div class="mb-4">
-                    <p class="text-lg text-gray-700">รายละเอียด:</p>
-                    <p class="text-gray-800 break-words">${data.description || 'ไม่มีรายละเอียด'}</p>
-                </div>
-                <div class="mb-4">
-                    <p class="text-lg text-gray-700">สร้างโดย:</p>
-                    <p class="text-gray-800">${data.created_by}</p>
-                </div>
-                <div class="mb-4">
-                    <p class="text-lg text-gray-700">ไฟล์ที่แนบ:</p>
-                    ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
-                </div>
-            `;
+            fetch(`/get-task-details/${taskId}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const taskDescriptionContent = document.getElementById('taskDescriptionContent');
+                    
+                    // Base Task Details
+                    let modalContent = `
+                        <div class="mb-4">
+                            <p class="text-lg text-gray-700">งาน:</p>
+                            <p class="text-gray-800 font-semibold">${data.title}</p>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-lg text-gray-700">รายละเอียด:</p>
+                            <p class="text-gray-800 break-words">${data.description || 'ไม่มีรายละเอียด'}</p>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-lg text-gray-700">สร้างโดย:</p>
+                            <p class="text-gray-800">${data.created_by}</p>
+                        </div>
+                        <div class="mb-4">
+                            <p class="text-lg text-gray-700">ไฟล์ที่แนบ:</p>
+                            ${data.file_url ? `<a href="${data.file_url}" target="_blank" class="text-blue-500 underline">ดาวน์โหลดไฟล์</a>` : '<p class="text-gray-400">ไม่มีไฟล์</p>'}
+                        </div>
+                    `;
 
-            // If Task Status is 'Done', Show URL & Details
-            if (data.status === 'done') {
-                modalContent += `
-                    <div class="mb-4">
-                        <p class="text-lg text-gray-700">URL ที่ส่งงาน:</p>
-                        ${data.url ? `<a href="${data.url}" target="_blank" class="text-blue-500 underline">${data.url}</a>` : '<p class="text-gray-400">ไม่มี URL</p>'}
-                    </div>
-                    <div class="mb-4">
-                        <p class="text-lg text-gray-700">รายละเอียดการส่งงาน:</p>
-                        <p class="text-gray-800 break-words">${data.details || 'ไม่มีรายละเอียดการส่งงาน'}</p>
-                    </div>
-                `;
-                    if (updateStatusButton) {
-                        updateStatusButton.style.display = 'none';
+                    // If Task Status is 'Done', Show URL & Details
+                    if (data.status === 'done') {
+                        modalContent += `
+                            <div class="mb-4">
+                                <p class="text-lg text-gray-700">URL ที่ส่งงาน:</p>
+                                ${data.url ? `<a href="${data.url}" target="_blank" class="text-blue-500 underline">${data.url}</a>` : '<p class="text-gray-400">ไม่มี URL</p>'}
+                            </div>
+                            <div class="mb-4">
+                                <p class="text-lg text-gray-700">รายละเอียดการส่งงาน:</p>
+                                <p class="text-gray-800 break-words">${data.details || 'ไม่มีรายละเอียดการส่งงาน'}</p>
+                            </div>
+                        `;
+                            if (updateStatusButton) {
+                                updateStatusButton.style.display = 'none';
+                            }
+                        } else {
+                            // Show "กำลังจะทำ" Button if Task is NOT Done
+                            if (updateStatusButton) {
+                                updateStatusButton.style.display = 'block';
+                            }
+
                     }
-                } else {
-                    // Show "กำลังจะทำ" Button if Task is NOT Done
-                    if (updateStatusButton) {
-                        updateStatusButton.style.display = 'block';
-                    }
 
-            }
+                    // Inject Content into Modal
+                    taskDescriptionContent.innerHTML = modalContent;
+                    document.getElementById('taskDescriptionModal').classList.remove('hidden');
+                })
+                .catch(error => console.error('Error fetching task details:', error));
+        }
 
-            // Inject Content into Modal
-            taskDescriptionContent.innerHTML = modalContent;
-            document.getElementById('taskDescriptionModal').classList.remove('hidden');
-        })
-        .catch(error => console.error('Error fetching task details:', error));
-}
-
-// Function to Hide the Modal
-function hideTaskDescriptionModal() {
-    document.getElementById('taskDescriptionModal').classList.add('hidden');
-}
+        // Function to Hide the Modal
+        function hideTaskDescriptionModal() {
+            document.getElementById('taskDescriptionModal').classList.add('hidden');
+        }
 
 
        
@@ -921,33 +896,33 @@ function hideTaskDescriptionModal() {
 
 
 
-    </script>
+        </script>
 
     
     
-    <script>
-        // JavaScript สำหรับเพิ่มเอฟเฟกต์การนับเลข
-        document.addEventListener('DOMContentLoaded', function () {
-            const counters = document.querySelectorAll('[data-target]'); // ค้นหากล่องที่มี data-target
-    
-            counters.forEach(counter => {
-                const updateCount = () => {
-                    const target = +counter.getAttribute('data-target'); // แปลงค่า target เป็นตัวเลข
-                    const current = +counter.innerText; // ดึงค่าปัจจุบันในกล่อง
-                    const increment = target / 100; // แบ่งการเพิ่มเป็น 100 ส่วน
-    
-                    if (current < target) {
-                        counter.innerText = Math.ceil(current + increment); // เพิ่มค่าปัจจุบัน
-                        setTimeout(updateCount, 30); // เรียกฟังก์ชันซ้ำทุก 30ms
-                    } else {
-                        counter.innerText = target; // หากถึงเป้าหมายแล้ว ตั้งค่าเป็นเป้าหมาย
-                    }
-                };
-    
-                updateCount(); // เริ่มฟังก์ชันนับเลข
+        <script>
+            // JavaScript สำหรับเพิ่มเอฟเฟกต์การนับเลข
+            document.addEventListener('DOMContentLoaded', function () {
+                const counters = document.querySelectorAll('[data-target]'); // ค้นหากล่องที่มี data-target
+        
+                counters.forEach(counter => {
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target'); // แปลงค่า target เป็นตัวเลข
+                        const current = +counter.innerText; // ดึงค่าปัจจุบันในกล่อง
+                        const increment = target / 100; // แบ่งการเพิ่มเป็น 100 ส่วน
+        
+                        if (current < target) {
+                            counter.innerText = Math.ceil(current + increment); // เพิ่มค่าปัจจุบัน
+                            setTimeout(updateCount, 30); // เรียกฟังก์ชันซ้ำทุก 30ms
+                        } else {
+                            counter.innerText = target; // หากถึงเป้าหมายแล้ว ตั้งค่าเป็นเป้าหมาย
+                        }
+                    };
+        
+                    updateCount(); // เริ่มฟังก์ชันนับเลข
+                });
             });
-        });
-    </script>
+        </script>
 
         <!-- Move the script to the bottom of the body -->
         <script>
@@ -983,35 +958,36 @@ function hideTaskDescriptionModal() {
             });
         });
     </script>
+
    <script>
-    // การกำหนดค่าให้เลือก
-    const workingOption = document.getElementById('working');
-    const notWorkingOption = document.getElementById('not_working');
-    const hiddenInput = document.getElementById('is_active');
+        // การกำหนดค่าให้เลือก
+        const workingOption = document.getElementById('working');
+        const notWorkingOption = document.getElementById('not_working');
+        const hiddenInput = document.getElementById('is_active');
 
-    // ฟังก์ชันเปลี่ยนสถานะเมื่อเลือกตัวใดตัวหนึ่ง
-    function selectOption(selected) {
-        if (selected === 'working') {
-            workingOption.classList.add('bg-blue-500', 'text-white');
-            notWorkingOption.classList.remove('bg-blue-500', 'text-white');
-            hiddenInput.value = 'working'; // กำหนดค่าให้ hidden input
-        } else if (selected === 'not_working') {
-            notWorkingOption.classList.add('bg-blue-500', 'text-white');
-            workingOption.classList.remove('bg-blue-500', 'text-white');
-            hiddenInput.value = 'not_working'; // กำหนดค่าให้ hidden input
+        // ฟังก์ชันเปลี่ยนสถานะเมื่อเลือกตัวใดตัวหนึ่ง
+        function selectOption(selected) {
+            if (selected === 'working') {
+                workingOption.classList.add('bg-blue-500', 'text-white');
+                notWorkingOption.classList.remove('bg-blue-500', 'text-white');
+                hiddenInput.value = 'working'; // กำหนดค่าให้ hidden input
+            } else if (selected === 'not_working') {
+                notWorkingOption.classList.add('bg-blue-500', 'text-white');
+                workingOption.classList.remove('bg-blue-500', 'text-white');
+                hiddenInput.value = 'not_working'; // กำหนดค่าให้ hidden input
+            }
         }
-    }
 
-    // การคลิกที่ "กำลังทำงาน"
-    workingOption.addEventListener('click', function() {
-        selectOption('working');
-    });
+        // การคลิกที่ "กำลังทำงาน"
+        workingOption.addEventListener('click', function() {
+            selectOption('working');
+        });
 
-    // การคลิกที่ "ไม่ทำงาน"
-    notWorkingOption.addEventListener('click', function() {
-        selectOption('not_working');
-    });
-</script>
+        // การคลิกที่ "ไม่ทำงาน"
+        notWorkingOption.addEventListener('click', function() {
+            selectOption('not_working');
+        });
+    </script>
     {% endblock %}
 
 
